@@ -18,6 +18,7 @@ Alle Tests basieren auf einer fixen Teststruktur auf dem Integrationssystem:
 | Gruppe | Typ | Inhalt |
 |---|---|---|
 | E2E Mio (ID: 582) | Mitgliederorganisation | Dachgruppe |
+| └ E2E Geschäftsstelle (ID: 619) | MitgliederorganisationGeschaeftsstelle | Person: E2E GS Mitarbeiter (ID: 3558) |
 | └ E2E Ortsgruppe | Ortsgruppe | |
 | &nbsp;&nbsp;└ E2E Jungschar (ID: 584) | Jungschar | |
 | &nbsp;&nbsp;&nbsp;&nbsp;├ E2E Eltern | Untergruppe | Person: E2E Mami |
@@ -27,7 +28,24 @@ Alle Tests basieren auf einer fixen Teststruktur auf dem Integrationssystem:
 
 **E2E Admin** (e2e-cevidb@cevimail.ch): Administrator auf Ebene Cevi Schweiz (Dachverband).
 
+**E2E Mio Admin** (ID: 3557): Administrator/-in in E2E Mio (Gruppe 582). Wird für Kurs-Tests imitiert.
+
 **E2E Finanzen** (ID: 3556): Person mit Finanz-Berechtigung in E2E Jungschar (Gruppe 584). Wird für Rechnungs-Tests imitiert.
+
+## Tests
+
+| Datei | Beschreibung |
+|---|---|
+| `ortsgruppe-aufbau.spec.ts` | Ortsgruppe mit Untergruppen erstellen und löschen (als Admin) |
+| `abos.spec.ts` | Mailing-List erstellen/löschen, An-/Abmeldung (als E2E AL) |
+| `rechnungen.spec.ts` | Rechnungen erstellen, drucken, stornieren (als E2E Finanzen) |
+| `quick-search.spec.ts` | Schnellsuche nach Personen |
+| `bestandesmeldung.spec.ts` | Bestandesmeldung validieren |
+| `spenderschutz.spec.ts` | Spender-Sichtbarkeitsschutz prüfen |
+| `anlass.spec.ts` | Anlass erstellen und löschen (als E2E AL in E2E Jungschar) |
+| `anlass-anmeldung.spec.ts` | Person (E2E Leiter) für Anlass anmelden und abmelden (als E2E AL) |
+| `kurs.spec.ts` | Kurs erstellen und löschen (als E2E Mio Admin in E2E Mio) |
+| `kurs-anmeldung.spec.ts` | Person (E2E Leiter) für Kurs anmelden und abmelden (als E2E Mio Admin) |
 
 ## Findings & Eigenheiten
 

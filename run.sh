@@ -23,4 +23,4 @@ docker run --rm \
   -e HITOBITO_PASSWORD="${HITOBITO_PASSWORD:-}" \
   -e HITOBITO_TOTP_SECRET="${HITOBITO_TOTP_SECRET:-}" \
   "mcr.microsoft.com/playwright:v1.58.2-noble" \
-  bash -c "npm install --silent && npx playwright test $*"
+  bash -c "mkdir -p screenshots && npm install --silent && npx playwright test $*"

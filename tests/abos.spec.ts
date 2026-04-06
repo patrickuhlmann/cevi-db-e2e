@@ -35,10 +35,12 @@ test.describe('Abos', () => {
 
     await expect(page).toHaveURL(/\/mailing_lists\/\d+/);
     await expect(page.locator('main h1, #main-content h1').first()).toContainText('E2E Test-Abo');
+    await page.screenshot({ path: 'screenshots/abos_erstellt.png' });
 
     page.once('dialog', (dialog) => dialog.accept());
     await page.getByRole('link', { name: /Löschen/i }).click();
     await expect(page.locator('#flash .alert-success')).toContainText(/gelöscht/);
+    await page.screenshot({ path: 'screenshots/abos_geloescht.png' });
 
     await stopImpersonation(page);
   });
@@ -58,6 +60,7 @@ test.describe('Abos', () => {
     // Anmelden
     await page.getByRole('link', { name: 'Anmelden' }).click();
     await expect(page.locator('#flash .alert-success')).toContainText(/angemeldet/);
+    await page.screenshot({ path: 'screenshots/abos_angemeldet.png' });
 
     // Zurück zur Abo-Detailseite → "Abmelden"-Button prüfen und klicken
     await page.goto(aboUrl);
@@ -65,6 +68,7 @@ test.describe('Abos', () => {
     await expect(abmeldenBtn).toBeVisible();
     await abmeldenBtn.click();
     await expect(page.locator('#flash .alert-success')).toContainText(/abgemeldet/);
+    await page.screenshot({ path: 'screenshots/abos_abgemeldet.png' });
 
     // Zurück zur Abo-Detailseite → "Anmelden"-Button prüfen
     await page.goto(aboUrl);

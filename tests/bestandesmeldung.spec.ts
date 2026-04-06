@@ -14,5 +14,6 @@ test.describe('Bestandesmeldung', () => {
 
     // Validierungsfehler: Hitobito zeigt Fehler in #error_explanation
     await expect(page.locator('#error_explanation')).toContainText('bereits vergeben');
+    await page.screenshot({ path: 'screenshots/bestandesmeldung_fehler.png' });
   });
 });

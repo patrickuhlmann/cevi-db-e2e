@@ -16,7 +16,7 @@ async function stopImpersonation(page: any) {
   await page.context().storageState({ path: AUTH_FILE });
 }
 
-async function createInvoice(page: any): Promise<string> {
+async function createInvoice(page: any, screenshotPrefix: string): Promise<string> {
   await page.goto(`/groups/${GROUP_ID}/invoices/new`);
   await page.getByLabel('Titel').fill('E2E Test-Rechnung');
   await page.locator('input[name="invoice[recipient_name]"]').fill('E2E Test-Empfänger');
@@ -32,14 +32,16 @@ async function createInvoice(page: any): Promise<string> {
   await page.getByRole('button', { name: 'Speichern' }).first().click();
   await page.waitForURL(/\/invoices\/\d+/);
   await expect(page.locator('#flash .alert-success')).toContainText(/erstellt/);
+  await page.screenshot({ path: `screenshots/${screenshotPrefix}_erstellt.png` });
   return page.url();
 }
 
-async function stornierenAndCleanup(page: any) {
+async function stornierenAndCleanup(page: any, screenshotPrefix: string) {
   page.once('dialog', (dialog: any) => dialog.accept());
   await page.getByRole('link', { name: 'Stornieren' }).click();
   await expect(page.locator('#flash .alert-success')).toContainText(/storniert/);
   await expect(page.locator('main')).not.toContainText('E2E Test-Rechnung');
+  await page.screenshot({ path: `screenshots/${screenshotPrefix}_storniert.png` });
 }
 
 test.describe('Rechnungen', () => {
@@ -54,21 +56,22 @@ test.describe('Rechnungen', () => {
 
     await expect(page).not.toHaveURL(/\/invoices\/new/);
     await expect(page.locator('#flash .alert-danger')).toContainText('nicht berechtigt');
+    await page.screenshot({ path: 'screenshots/rechnungen_admin_kein_zugriff.png' });
   });
 
   test('Neue Rechnung erstellen und stornieren (als E2E Finanzen)', async ({ page }) => {
     await impersonateFinanzen(page);
 
-    await createInvoice(page);
+    await createInvoice(page, 'rechnungen_erstellen');
 
-    await stornierenAndCleanup(page);
+    await stornierenAndCleanup(page, 'rechnungen_erstellen');
     await stopImpersonation(page);
   });
 
   test('Rechnung als PDF drucken (als E2E Finanzen)', async ({ page }) => {
     await impersonateFinanzen(page);
 
-    const invoiceUrl = await createInvoice(page);
+    const invoiceUrl = await createInvoice(page, 'rechnungen_drucken');
 
     // Drucken-Dropdown öffnen und PDF-Export starten
     await page.goto(invoiceUrl);
@@ -77,6 +80,7 @@ test.describe('Rechnungen', () => {
 
     // Asynchroner Export: Download-Spinner erscheint
     await expect(page.locator('#file-download-spinner')).toBeVisible();
+    await page.screenshot({ path: 'screenshots/rechnungen_drucken_spinner.png' });
 
     // Download abbrechen damit der Cookie nicht in die Session gespeichert wird
     await page.locator('#cancel_async_downloads').click();
@@ -84,14 +88,14 @@ test.describe('Rechnungen', () => {
 
     // Cleanup
     await page.goto(invoiceUrl);
-    await stornierenAndCleanup(page);
+    await stornierenAndCleanup(page, 'rechnungen_drucken');
     await stopImpersonation(page);
   });
 
   test('Rechnung per E-Mail senden (als E2E Finanzen)', async ({ page }) => {
     await impersonateFinanzen(page);
 
-    const invoiceUrl = await createInvoice(page);
+    const invoiceUrl = await createInvoice(page, 'rechnungen_mail');
 
     // Rechnung stellen und per E-Mail verschicken
     await page.goto(invoiceUrl);
@@ -100,10 +104,11 @@ test.describe('Rechnungen', () => {
 
     // Flash bestätigt den Hintergrund-Versand
     await expect(page.locator('#flash')).toContainText(/im Hintergrund per E-Mail verschickt/);
+    await page.screenshot({ path: 'screenshots/rechnungen_mail_versand.png' });
 
-    // Cleanup: stornierte Rechnungen sind im Standardfilter nicht sichtbar
+    // Cleanup
     await page.goto(invoiceUrl);
-    await stornierenAndCleanup(page);
+    await stornierenAndCleanup(page, 'rechnungen_mail');
     await stopImpersonation(page);
   });
 });

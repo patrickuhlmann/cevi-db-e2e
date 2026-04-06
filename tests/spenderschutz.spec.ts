@@ -6,5 +6,6 @@ test.describe('Spenderschutz', () => {
 
     await expect(page.locator('body')).toContainText('0 Personen angezeigt');
     await expect(page.locator('body')).toContainText('1 weitere Person ist für dich nicht sichtbar');
+    await page.screenshot({ path: 'screenshots/spenderschutz_nicht_sichtbar.png' });
   });
 });

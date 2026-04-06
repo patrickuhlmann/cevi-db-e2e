@@ -13,6 +13,7 @@ test.describe('Schnellsuche', () => {
     // bei mehreren Treffern zur Suchergebnisseite /full?q=
     await page.waitForURL(/\/full\?q=|\/people\/\d+/, { timeout: 10000 });
     await expect(page.locator('body')).toContainText('E2E Leiter');
+    await page.screenshot({ path: 'screenshots/quicksearch_leiter_gefunden.png' });
   });
 
   test('Kind in Ortsgruppe wird nicht gefunden', async ({ page }) => {
@@ -21,5 +22,6 @@ test.describe('Schnellsuche', () => {
 
     await page.waitForURL(/\/full\?q=|\/people\/\d+/, { timeout: 10000 });
     await expect(page.locator('body')).not.toContainText('E2E Kind');
+    await page.screenshot({ path: 'screenshots/quicksearch_kind_nicht_gefunden.png' });
   });
 });

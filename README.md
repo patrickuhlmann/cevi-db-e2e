@@ -44,6 +44,8 @@ Alle Tests basieren auf einer fixen Teststruktur auf dem Integrationssystem:
 
 **E2E Admin** (e2e-cevidb@cevimail.ch): Administrator auf Ebene Cevi Schweiz (Dachverband).
 
+**E2E Finanzen** (ID: 3556): Person mit Finanz-Berechtigung in E2E Jungschar (Gruppe 584). Wird für Rechnungs-Tests imitiert.
+
 ## Findings & Eigenheiten der cevi.db
 
 ### Authentifizierung
@@ -125,6 +127,19 @@ Löschen-Links triggern einen Browser-nativen `confirm()`-Dialog:
 page.once('dialog', (dialog) => dialog.accept());
 await page.getByRole('link', { name: /Löschen/i }).click();
 ```
+
+### Rechnungen (Invoices)
+
+- Rechnungen sind unter `/groups/{group_id}/invoices` erreichbar
+- Neue Rechnung: `/groups/{group_id}/invoices/new`
+- Pflichtfelder im Formular: **Titel**, **Strasse**, **PLZ**, **Ort**, **Land** des Empfängers
+- Rechnungsposition hinzufügen: erst auf "Eintrag hinzufügen" klicken – die Felder erscheinen dann mit Platzhaltern "Name", "Preis", "Anzahl"
+- Nach dem Speichern: Redirect auf die **Detailseite** der Rechnung (URL: `/groups/{id}/invoices/{id}`, Flash `/erstellt/`)
+- PDF-Drucken ist **asynchron** (AsyncDownload): Dropdown "Drucken" → "Rechnung inkl. Einzahlungsschein" startet einen Hintergrundjob und zeigt `#file-download-spinner`
+- **Wichtig**: Nach dem Drucken den Download via `#cancel_async_downloads` abbrechen, bevor die Session gespeichert wird – sonst verursacht der Download-Cookie in Folgetests `net::ERR_ABORTED`
+- Mail-Versand: Dropdown "Rechnung stellen / mahnen" → "Status setzen ... und per E-Mail verschicken", Flash: `/im Hintergrund per E-Mail verschickt/`
+- Rechnung löschen heisst **Stornieren** (Button "Stornieren", Flash `/storniert/`) – der Datensatz bleibt als `cancelled` erhalten
+- E2E Finanzen (ID: 3556) hat die nötigen Finanz-Rechte in E2E Jungschar (Gruppe 584)
 
 ### Spenderschutz
 

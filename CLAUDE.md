@@ -1,0 +1,2 @@
+* Neu erstellte Tests jeweils ausführen um sicherzustellen, dass diese funktionieren
+* Neue Testpersonen/Testdaten die bereits existieren müssen und nicht selber angelegt werden im README.md beschreiben

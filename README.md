@@ -5,28 +5,11 @@ Playwright-Tests gegen https://cevi.puzzle.ch (Umgebung: INTEGRATION).
 ## Voraussetzungen
 
 - Docker installiert
-- `.env` Datei angelegt (siehe `.env.example`):
+- `.env` Datei anlegen (siehe `.env.example`):
   ```
   HITOBITO_PASSWORD=...
   HITOBITO_TOTP_SECRET=...   # nur falls 2FA aktiv
   ```
-
-## Tests ausführen
-
-```bash
-# Alle Tests
-./run.sh
-
-# Einzelne Datei
-./run.sh tests/abos.spec.ts
-
-# Nach Testname filtern
-./run.sh --grep "Abo"
-./run.sh --grep "Spender"
-
-# Mehrere Filter kombinieren (ODER)
-./run.sh --grep "Abo|Bestand"
-```
 
 ## Testdaten
 
@@ -34,7 +17,7 @@ Alle Tests basieren auf einer fixen Teststruktur auf dem Integrationssystem:
 
 | Gruppe | Typ | Inhalt |
 |---|---|---|
-| E2E Mio | Mitgliederorganisation | Dachgruppe |
+| E2E Mio (ID: 582) | Mitgliederorganisation | Dachgruppe |
 | └ E2E Ortsgruppe | Ortsgruppe | |
 | &nbsp;&nbsp;└ E2E Jungschar (ID: 584) | Jungschar | |
 | &nbsp;&nbsp;&nbsp;&nbsp;├ E2E Eltern | Untergruppe | Person: E2E Mami |
@@ -46,102 +29,11 @@ Alle Tests basieren auf einer fixen Teststruktur auf dem Integrationssystem:
 
 **E2E Finanzen** (ID: 3556): Person mit Finanz-Berechtigung in E2E Jungschar (Gruppe 584). Wird für Rechnungs-Tests imitiert.
 
-## Findings & Eigenheiten der cevi.db
+## Findings & Eigenheiten
 
-### Authentifizierung
+Alle bekannten Selektoren, Eigenheiten und Code-Snippets stehen in **CLAUDE.md** (für AI-Agents optimiert). Relevante Highlights:
 
-- Login-Feld heisst intern `login_identity`, Label in der UI: **"Haupt-E-Mail"**
-- 2FA-Seite erscheint nach dem Login auf einer eigenen Seite (URL enthält nicht `sign_in`)
-- 2FA-Eingabefeld: `input[name="second_factor_code"]`, Button: "Absenden"
-- Session-Typ: **`ActiveRecord::SessionStore`** (DB-basiert, kein Cookie-Store)
-
-### Session-Rotation bei Impersonation
-
-Wenn ein User einen anderen imitiert (`sign_in` via Devise), rotiert Rails die Session-ID serverseitig. Die alte Session in `storageState` wird damit ungültig.
-
-**Lösung**: Der Test, der Impersonation verwendet, muss am Schluss:
-1. Die Imitation beenden ("Imitation beenden"-Link)
-2. Die neue gültige Session in `AUTH_FILE` speichern:
-   ```typescript
-   await page.getByRole('link', { name: 'Imitation beenden' }).click();
-   await page.context().storageState({ path: AUTH_FILE });
-   ```
-
-Damit können nachfolgende Tests die frische Session verwenden.
-
-### Impersonation (Benutzer imitieren)
-
-- Nur Accounts mit der Rolle **Administrator/-in** auf Dachverband-Ebene haben die Berechtigung
-- Button "Imitieren" auf der Personendetailseite (nur sichtbar für berechtigte User)
-- Route: `POST /groups/{group_id}/people/{person_id}/impersonate`
-- Impersonations-Banner: `.user-impersonation` (zeigt "Du bist jetzt als X angemeldet")
-- Beenden: Link "Imitation beenden" im Banner
-
-**Warum nötig**: Der E2E Admin hat `layer_and_below_full`-Rechte auf Dachverband-Ebene, aber das Erstellen von Abos (Mailing Lists) prüft `in_same_layer_if_active` — d.h. nur innerhalb der *eigenen* Layer. Da Jungschar eine eigene Layer ist, fehlt dem Dachverband-Admin die Berechtigung. Der E2E AL als Gruppenführer in der Jungschar hat `group_full`-Rechte und darf Abos erstellen.
-
-### Berechtigungen für Mailing Lists (Abos)
-
-Erstellen/Bearbeiten/Löschen erfordert eine dieser Berechtigungen:
-- `group_full` → in derselben Gruppe
-- `group_and_below_full` → in der Gruppe oder darunter
-- `layer_full` / `layer_and_below_full` → innerhalb derselben Layer
-
-### Schnellsuche
-
-- Suchfeld: `#quicksearch`, Button: `.quicksearch-button`
-- Bei **genau einem Treffer**: direkt zur Personenseite (`/groups/{id}/people/{id}`)
-- Bei **mehreren Treffern**: Suchergebnisseite (`/full?q=...`)
-- URL-Pattern für beide Fälle: `/full\?q=|\/people\/\d+`
-- **Kinder** (Fröschli-Gruppe) sind global nicht suchbar
-- **Leiter** (Team-Gruppe) sind global suchbar
-
-### Validierungsfehler
-
-Hitobito zeigt Formularfehler in `#error_explanation.alert.alert-danger`:
-```typescript
-await expect(page.locator('#error_explanation')).toContainText('bereits vergeben');
-```
-Nicht `.alert` allein verwenden — auf jeder Seite gibt es globale `.alert`-Elemente (Download-Banner, MailChimp-Banner).
-
-### Flash-Meldungen
-
-Erfolgs- und Fehlermeldungen:
-```typescript
-// Erfolg
-await expect(page.locator('#flash .alert-success')).toContainText(/gelöscht/);
-// Fehler
-await expect(page.locator('#flash .alert-danger')).toContainText('...');
-```
-
-### Seitentitel
-
-Die Seite hat zwei `<h1>`: einen für den Umgebungs-Banner ("Umgebung: INTEGRATION") und einen für den eigentlichen Seiteninhalt. Immer den zweiten ansprechen:
-```typescript
-await expect(page.locator('main h1').first()).toContainText('Mein Titel');
-```
-
-### Bestätigungs-Dialoge (Löschen)
-
-Löschen-Links triggern einen Browser-nativen `confirm()`-Dialog:
-```typescript
-page.once('dialog', (dialog) => dialog.accept());
-await page.getByRole('link', { name: /Löschen/i }).click();
-```
-
-### Rechnungen (Invoices)
-
-- Rechnungen sind unter `/groups/{group_id}/invoices` erreichbar
-- Neue Rechnung: `/groups/{group_id}/invoices/new`
-- Pflichtfelder im Formular: **Titel**, **Strasse**, **PLZ**, **Ort**, **Land** des Empfängers
-- Rechnungsposition hinzufügen: erst auf "Eintrag hinzufügen" klicken – die Felder erscheinen dann mit Platzhaltern "Name", "Preis", "Anzahl"
-- Nach dem Speichern: Redirect auf die **Detailseite** der Rechnung (URL: `/groups/{id}/invoices/{id}`, Flash `/erstellt/`)
-- PDF-Drucken ist **asynchron** (AsyncDownload): Dropdown "Drucken" → "Rechnung inkl. Einzahlungsschein" startet einen Hintergrundjob und zeigt `#file-download-spinner`
-- **Wichtig**: Nach dem Drucken den Download via `#cancel_async_downloads` abbrechen, bevor die Session gespeichert wird – sonst verursacht der Download-Cookie in Folgetests `net::ERR_ABORTED`
-- Mail-Versand: Dropdown "Rechnung stellen / mahnen" → "Status setzen ... und per E-Mail verschicken", Flash: `/im Hintergrund per E-Mail verschickt/`
-- Rechnung löschen heisst **Stornieren** (Button "Stornieren", Flash `/storniert/`) – der Datensatz bleibt als `cancelled` erhalten
-- E2E Finanzen (ID: 3556) hat die nötigen Finanz-Rechte in E2E Jungschar (Gruppe 584)
-
-### Spenderschutz
-
-Personen in der Spender-Gruppe sind für normale Admins nicht sichtbar. Die Gruppenansicht zeigt:
-> "0 Personen angezeigt. 1 weitere Person ist für dich nicht sichtbar."
+- **Impersonation**: Benutzer imitieren erfordert danach `storageState` neu speichern (Session-ID rotiert)
+- **Mailing Lists**: Erstellen/Bearbeiten erfordert `layer_full`-Rechte in der Layer der Gruppe – Dachverband-Admin hat diese für Jungschar-Layer nicht, daher Impersonation als E2E AL nötig
+- **Rechnungen**: PDF-Druck ist async (`#file-download-spinner`), Download vor Session-Speicherung via `#cancel_async_downloads` abbrechen
+- **Spenderschutz**: Personen in Spender-Gruppen sind für normale Admins nicht sichtbar

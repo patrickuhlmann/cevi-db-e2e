@@ -13,6 +13,6 @@
     "@types/node": "^26.0.1"
   },
   "dependencies": {
-    "otpauth": "^9.3.0"
+    "otpauth": "^9.5.1"
   }
 }

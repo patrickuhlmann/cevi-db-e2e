@@ -26,8 +26,27 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      # Browsers cached -> only install system deps (apt). Otherwise full download.
+      - name: Install Playwright system deps (cache hit)
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+
+      - name: Install Playwright browsers (cache miss)
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: |
+          for attempt in 1 2 3; do
+            timeout 300 npx playwright install --with-deps chromium && exit 0
+            echo "::warning::Playwright install attempt $attempt timed out or failed, retrying..."
+          done
+          echo "::error::Playwright install failed after 3 attempts"
+          exit 1
 
       - name: Run E2E tests
         env:

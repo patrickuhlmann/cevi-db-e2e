@@ -3,6 +3,7 @@
 * Neue Testpersonen/Testdaten die bereits existieren müssen und nicht selber angelegt werden im README.md beschreiben
 * An sinnvollen Stellen (nach wichtigen Assertions) Screenshots erstellen: `await page.screenshot({ path: 'screenshots/name.png' })`. Benennung: `{spec}_{schritt}.png`, z.B. `rechnungen_erstellt.png`. Screenshots gehen nach `e2e/screenshots/` und werden bei jedem Lauf überschrieben (immer aktueller Stand). Zweck: manuelle visuelle Prüfung nach automatischer Ausführung.
 * Sofern weitere Eigenheiten der cevi.db auftauchen bitte diese in der CLAUDE.md dokumentieren (für AI-Agents optimiert, damit diese bei Testentwicklung direkt darauf zugreifen können).
+* Es wird direkt auf `main` gearbeitet (kein Feature-Branch / PR-Workflow). Commits direkt auf `main` und pushen.
 
 ## Eigenheiten der cevi.db
 

@@ -5,6 +5,16 @@
 * Sofern weitere Eigenheiten der cevi.db auftauchen bitte diese in der CLAUDE.md dokumentieren (für AI-Agents optimiert, damit diese bei Testentwicklung direkt darauf zugreifen können).
 * Es wird direkt auf `main` gearbeitet (kein Feature-Branch / PR-Workflow). Commits direkt auf `main` und pushen.
 
+## Tooling
+
+Alle Runtime-Befehle laufen über `tooling/docker.sh` – nie `npm`/`node`/`npx` direkt aufrufen. Das Skript läuft im offiziellen Playwright-Container als Host-User (`--user`, `HOME=/tmp`), damit erzeugte Dateien (`node_modules`, `screenshots`, `playwright-report`, `test-results`, `.auth`) **nicht root gehören**. Der Image-Tag wird aus der `@playwright/test`-Version in `package.json` abgeleitet (einzige Quelle der Wahrheit, von dependabot aktualisiert).
+
+Verfügbare Befehle:
+- `tooling/docker.sh test` — alle E2E-Tests ausführen
+- `tooling/docker.sh test --grep "Abo"` — Tests nach Name filtern
+- `tooling/docker.sh test tests/abos.spec.ts` — einzelne Datei
+- `tooling/docker.sh npm install` — beliebiger npm-Befehl im Container
+
 ## Eigenheiten der cevi.db
 
 ### Formularfelder

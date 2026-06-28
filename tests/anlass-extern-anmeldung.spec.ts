@@ -59,7 +59,6 @@ async function createEventWithExternalApplications(page: any): Promise<number> {
 
 test.describe('Externe Anlass-Anmeldung', () => {
   test('Externe Person meldet sich für einen Anlass mit externer Anmeldung an', async ({ page }) => {
-    test.setTimeout(120000);
     // === Phase 1: Anlass erstellen (als E2E AL) ===
     await impersonateAL(page);
     const eventId = await createEventWithExternalApplications(page);

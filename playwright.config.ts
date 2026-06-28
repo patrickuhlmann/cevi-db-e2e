@@ -9,8 +9,10 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   workers: 1,
-  timeout: 15000,
-  reporter: 'html',
+  timeout: 60000,
+  // 'list' gibt waehrend des Laufs pro Testfall eine Zeile (OK/Fehler) aus,
+  // 'html' erzeugt zusaetzlich den Report fuer den CI-Artifact-Upload.
+  reporter: [['list'], ['html']],
 
   use: {
     baseURL: process.env.BASE_URL || 'https://cevi.puzzle.ch',

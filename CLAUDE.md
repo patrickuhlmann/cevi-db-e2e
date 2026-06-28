@@ -148,3 +148,30 @@ const eventUrl = page.url();
 const eventId = parseInt(eventUrl.match(/\/events\/(\d+)/)[1]);
 // Später: await page.goto(`/groups/${GROUP_ID}/events/${eventId}`);
 ```
+
+### Rechnungs-Empfänger: Vor-/Nachname statt `recipient_name`
+
+Seit dem Hitobito-Update gibt es **kein** `invoice[recipient_name]`-Feld mehr. Der Empfängername ist aufgeteilt in `invoice[recipient_first_name]`, `invoice[recipient_last_name]` und `invoice[recipient_company_name]`. Strasse/Nr./PLZ/Ort heissen unverändert `recipient_street`/`recipient_housenumber`/`recipient_zip_code`/`recipient_town` (street ist jetzt ein Adress-Autocomplete, `.fill()` funktioniert aber weiterhin):
+```typescript
+await page.locator('input[name="invoice[recipient_first_name]"]').fill('E2E');
+await page.locator('input[name="invoice[recipient_last_name]"]').fill('Test-Empfänger');
+```
+
+### Rechnungs-Land: Tom-Select-Widget
+
+Das Land-Select (`#invoice_recipient_country`) ist jetzt ein Tom-Select-Widget (`data-controller="tom-select"`); das echte `<select>` ist visuell versteckt (`ts-hidden-accessible`), daher schlägt `selectOption` an der Sichtbarkeitsprüfung fehl. Stattdessen über das Control-Element öffnen und im Dropdown wählen. `getByRole('option', …)` matcht die nativen `<option>`-Elemente (CH kommt doppelt vor) – darum den Dropdown-Div ansprechen:
+```typescript
+await page.locator('#invoice_recipient_country-ts-control').click();
+await page.locator('#invoice_recipient_country-ts-dropdown [data-value="CH"]').first().click();
+```
+
+### Rechnung als PDF: direkter Download statt async Export
+
+Der PDF-Export im "Drucken"-Dropdown ist **kein asynchroner Export mit Spinner mehr** (`#file-download-spinner` / `#cancel_async_downloads` existieren nicht mehr). Die Links zeigen direkt auf `…/invoices/:id.pdf` und lösen ein synchrones `download`-Event aus:
+```typescript
+await page.locator('.dropdown-toggle', { hasText: 'Drucken' }).click();
+const downloadPromise = page.waitForEvent('download');
+await page.getByRole('link', { name: 'Rechnung inkl. Einzahlungsschein', exact: true }).click();
+const download = await downloadPromise;
+expect(download.suggestedFilename()).toMatch(/\.pdf$/);
+```

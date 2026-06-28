@@ -19,12 +19,18 @@ async function stopImpersonation(page: any) {
 async function createInvoice(page: any, screenshotPrefix: string): Promise<string> {
   await page.goto(`/groups/${GROUP_ID}/invoices/new`);
   await page.getByLabel('Titel').fill('E2E Test-Rechnung');
-  await page.locator('input[name="invoice[recipient_name]"]').fill('E2E Test-Empfänger');
+  // Empfängername ist seit Hitobito-Update auf Vor-/Nachname aufgeteilt
+  // (recipient_name existiert nicht mehr).
+  await page.locator('input[name="invoice[recipient_first_name]"]').fill('E2E');
+  await page.locator('input[name="invoice[recipient_last_name]"]').fill('Test-Empfänger');
   await page.locator('input[name="invoice[recipient_street]"]').fill('Teststrasse');
   await page.locator('input[name="invoice[recipient_housenumber]"]').fill('1');
   await page.locator('input[name="invoice[recipient_zip_code]"]').fill('8000');
   await page.locator('input[name="invoice[recipient_town]"]').fill('Zürich');
-  await page.locator('select[name="invoice[recipient_country]"]').selectOption('CH');
+  // Land ist jetzt ein Tom-Select-Widget; das echte <select> ist visuell
+  // versteckt, daher über das Control-Element auswählen statt selectOption.
+  await page.locator('#invoice_recipient_country-ts-control').click();
+  await page.locator('#invoice_recipient_country-ts-dropdown [data-value="CH"]').first().click();
   await page.getByRole('link', { name: 'Eintrag hinzufügen' }).click();
   await page.locator('#invoice_items_fields .fields:visible input[placeholder="Name"]').fill('E2E Testposition');
   await page.locator('#invoice_items_fields .fields:visible input[placeholder="Preis"]').fill('42.00');
@@ -76,15 +82,15 @@ test.describe('Rechnungen', () => {
     // Drucken-Dropdown öffnen und PDF-Export starten
     await page.goto(invoiceUrl);
     await page.locator('.dropdown-toggle', { hasText: 'Drucken' }).click();
+
+    // PDF-Export ist seit dem Hitobito-Update ein direkter, synchroner Download
+    // (kein async Export mit Spinner/Cancel mehr). Der Link zeigt direkt auf .pdf
+    // und löst ein download-Event aus.
+    const downloadPromise = page.waitForEvent('download');
     await page.getByRole('link', { name: 'Rechnung inkl. Einzahlungsschein', exact: true }).click();
-
-    // Asynchroner Export: Download-Spinner erscheint
-    await expect(page.locator('#file-download-spinner')).toBeVisible();
-    await page.screenshot({ path: 'screenshots/rechnungen_drucken_spinner.png' });
-
-    // Download abbrechen damit der Cookie nicht in die Session gespeichert wird
-    await page.locator('#cancel_async_downloads').click();
-    await expect(page.locator('#file-download-spinner')).not.toBeVisible();
+    const download = await downloadPromise;
+    expect(download.suggestedFilename()).toMatch(/\.pdf$/);
+    await page.screenshot({ path: 'screenshots/rechnungen_drucken_pdf.png' });
 
     // Cleanup
     await page.goto(invoiceUrl);

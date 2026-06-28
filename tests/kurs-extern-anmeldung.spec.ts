@@ -57,7 +57,7 @@ async function createCourseWithExternalApplications(page: any): Promise<number> 
 
 test.describe('Externe Kurs-Anmeldung', () => {
   test('Externe Person meldet sich für einen Kurs mit externer Anmeldung an', async ({ page }) => {
-    test.setTimeout(120000);
+    test.setTimeout(60000);
     // === Phase 1: Kurs erstellen (als E2E Mio Admin) ===
     await impersonateMioAdmin(page);
     const eventId = await createCourseWithExternalApplications(page);

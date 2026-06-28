@@ -66,6 +66,7 @@ test.describe('Rechnungen', () => {
   });
 
   test('Neue Rechnung erstellen und stornieren (als E2E Finanzen)', async ({ page }) => {
+    test.setTimeout(60000); // Mehrphasig: Erstellen → Stornieren → Imitation beenden
     await impersonateFinanzen(page);
 
     await createInvoice(page, 'rechnungen_erstellen');
@@ -75,6 +76,7 @@ test.describe('Rechnungen', () => {
   });
 
   test('Rechnung als PDF drucken (als E2E Finanzen)', async ({ page }) => {
+    test.setTimeout(60000); // Mehrphasig: Erstellen → PDF-Download → Stornieren → Imitation beenden
     await impersonateFinanzen(page);
 
     const invoiceUrl = await createInvoice(page, 'rechnungen_drucken');
@@ -99,6 +101,7 @@ test.describe('Rechnungen', () => {
   });
 
   test('Rechnung per E-Mail senden (als E2E Finanzen)', async ({ page }) => {
+    test.setTimeout(60000); // Mehrphasig: Erstellen → E-Mail-Versand → Stornieren → Imitation beenden
     await impersonateFinanzen(page);
 
     const invoiceUrl = await createInvoice(page, 'rechnungen_mail');

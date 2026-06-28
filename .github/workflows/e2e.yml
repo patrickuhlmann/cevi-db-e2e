@@ -10,14 +10,35 @@ on:
   workflow_dispatch:
 
 jobs:
+  # Leitet den Playwright-Image-Tag aus der @playwright/test-Version in
+  # package.json ab. So gibt es nur EINE Quelle der Wahrheit, die dependabot
+  # (npm-Ecosystem) automatisch aktualisiert. dependabot aktualisiert das
+  # 'container.image'-Feld in Workflows NICHT selbst.
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      playwright-image: ${{ steps.version.outputs.image }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Playwright-Version ermitteln
+        id: version
+        run: |
+          version="$(sed -n 's/.*"@playwright\/test": *"[\^~>=< ]*\([0-9][0-9.]*\)".*/\1/p' package.json)"
+          if [ -z "$version" ]; then
+            echo "Konnte @playwright/test-Version nicht aus package.json lesen." >&2
+            exit 1
+          fi
+          echo "image=mcr.microsoft.com/playwright:v${version}-noble" >> "$GITHUB_OUTPUT"
+
   e2e:
+    needs: setup
     runs-on: ubuntu-latest
     timeout-minutes: 15
     # Offizielles Playwright-Image: passende Browser sind vorinstalliert, kein
     # 'playwright install'-Download noetig (haengt sonst auf dem Runner).
-    # Tag MUSS zur @playwright/test-Version in package.json passen.
+    # Tag wird im 'setup'-Job aus package.json abgeleitet.
     container:
-      image: mcr.microsoft.com/playwright:v1.58.2-noble
+      image: ${{ needs.setup.outputs.playwright-image }}
 
     steps:
       - uses: actions/checkout@v7

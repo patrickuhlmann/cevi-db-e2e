@@ -18,7 +18,7 @@ if [[ -z "$PLAYWRIGHT_VERSION" ]]; then
 fi
 PLAYWRIGHT_IMAGE="mcr.microsoft.com/playwright:v${PLAYWRIGHT_VERSION}-noble"
 
-# .env laden falls vorhanden (HITOBITO_PASSWORD, HITOBITO_TOTP_SECRET)
+# .env laden falls vorhanden (HITOBITO_PASSWORD, HITOBITO_TOTP_SECRET, HITOBITO_API_TOKEN)
 if [[ -f "${PROJECT_ROOT}/.env" ]]; then
   set -o allexport
   # shellcheck disable=SC1091
@@ -29,9 +29,10 @@ fi
 case "$CMD" in
   test)
     # Verwendung:
-    #   tooling/docker.sh test                    # alle Tests
-    #   tooling/docker.sh test --grep "Abo"       # nach Name filtern
-    #   tooling/docker.sh test tests/abos.spec.ts # einzelne Datei
+    #   tooling/docker.sh test                                              # alle UI-Tests
+    #   tooling/docker.sh test --grep "Abo"                                # nach Name filtern
+    #   tooling/docker.sh test tests/abos.spec.ts                         # einzelne Datei
+    #   tooling/docker.sh test --config=api-tests/playwright.config.api.ts # API-Smoke-Suite
     docker run --rm -i \
       "${NODE_USER_ARGS[@]}" \
       --network host \
@@ -39,6 +40,7 @@ case "$CMD" in
       -w /e2e \
       -e HITOBITO_PASSWORD="${HITOBITO_PASSWORD:-}" \
       -e HITOBITO_TOTP_SECRET="${HITOBITO_TOTP_SECRET:-}" \
+      -e HITOBITO_API_TOKEN="${HITOBITO_API_TOKEN:-}" \
       "${PLAYWRIGHT_IMAGE}" \
       bash -c "mkdir -p screenshots && npm install --silent && npx playwright test ${*:2}"
     ;;

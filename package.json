@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "test": "playwright test",
+    "test:api": "playwright test --config=api-tests/playwright.config.api.ts",
     "test:ui": "playwright test --ui",
     "test:headed": "playwright test --headed",
     "codegen": "playwright codegen https://cevi.puzzle.ch"

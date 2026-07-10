@@ -2,6 +2,7 @@ node_modules/
 .auth/
 .env
 playwright-report/
+playwright-report-api/
 test-results/
 screenshots/
 .idea/

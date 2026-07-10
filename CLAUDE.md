@@ -187,3 +187,38 @@ await page.getByRole('link', { name: 'Rechnung inkl. Einzahlungsschein', exact: 
 const download = await downloadPromise;
 expect(download.suggestedFilename()).toMatch(/\.pdf$/);
 ```
+
+### Rechnung direkt auf einer Person erstellen: zwei getrennte Berechtigungen nötig
+
+Der "Rechnung erstellen"-Button auf der Personendetailseite (`invoice_button(people: [entry])`) verlangt serverseitig **zwei unabhängige Rechte**: `:finance` (Rechnung erstellen dürfen) UND `:update` auf die Person (damit der Empfänger automatisch verknüpft wird, `InvoicesController#new`: `if recipient && can?(:update, recipient)`). Die reine Finanzrolle (`Finanzverantwortlicher`) gewährt in diesem Wagon nur ein sehr eng gescoptes `:financials`-Recht (nur für Personen in Spender-Gruppen), **nicht** das allgemeine Personen-Update-Recht. E2E Finanzen braucht daher zusätzlich eine zweite Rolle mit `layer_and_below_full` (z.B. Adressverwalter/-in) in E2E Jungschar.
+
+Selbst mit beiden Rechten ist der Button in der INTEGRATION-Umgebung als `<a class="disabled">` **ohne `href`** gerendert (`Dropdown::InvoiceNew#single_button` deaktiviert ihn, sobald `invoice_config.invalid?` ist – unabhängig von den Personen-Rechten). Ein Klick funktioniert daher nie; stattdessen direkt auf die vom Button erzeugte Ziel-URL navigieren:
+```typescript
+await page.goto(
+  `/groups/${GROUP_ID}/invoices/new?invoice%5Brecipient_id%5D=${PERSON_ID}&invoice%5Brecipient_type%5D=Person`
+);
+```
+Nur Vor-/Nachname werden vorausgefüllt; falls die Person keine Adresse hinterlegt hat (z.B. E2E AL), müssen Strasse/PLZ/Ort weiterhin manuell ausgefüllt werden (das Land ist dort als normales `<select>` bereits korrekt auf "Schweiz" vorausgewählt, kein Tom-Select-Klick nötig).
+
+Ausserdem: nur **direkte Mitglieder** der in der URL verwendeten Gruppe sind über `/groups/:id/people/:person_id` erreichbar (404 sonst) – z.B. ist E2E Leiter Mitglied von "E2E Team" (Untergruppe), nicht direkt von "E2E Jungschar" (584), und daher unter `/groups/584/people/<E2E-Leiter-ID>` nicht erreichbar. E2E AL ist hingegen direktes Mitglied von 584.
+
+### `<main>` ist auf manchen Seiten nur ein leerer Skip-Link-Anker
+
+Auf Rechnungs-Detailseiten enthält `<main>` **nicht** den eigentlichen Seiteninhalt, sondern ist praktisch leer (nur Ziel des "Zum Hauptinhalt springen"-Links). Negative Prüfungen (`not.toContainText`) fallen dadurch unbemerkt immer grün aus; für positive Prüfungen gegen `body` prüfen:
+```typescript
+await expect(page.locator('body')).toContainText('Bezahlt');
+```
+
+### Zahlung erfassen: Toggle-Link und Submit-Button heissen identisch
+
+Auf der Rechnungs-Detailseite öffnet ein Link "Zahlung erstellen" das Zahlungsformular (Collapse `#payment`); der Submit-Button **im Formular** trägt denselben Text "Zahlung erstellen" (nicht "Speichern"). Beim Button auf `#payment` scopen, um den Toggle-Link nicht versehentlich zu matchen:
+```typescript
+await page.getByRole('link', { name: 'Zahlung erstellen' }).click();
+await page.getByLabel('Betrag').fill('42.00');
+await page.locator('#payment').getByRole('button', { name: 'Zahlung erstellen' }).click();
+```
+Das Eingangsdatum ist bereits mit dem heutigen Datum vorausgefüllt. Die Erfolgsmeldung enthält **kein** Währungskürzel: `Zahlung über 42.00 wurde erfasst.` (nicht "CHF 42.00"). Eine Zahlung über den vollen offenen Betrag setzt den Status direkt auf "Bezahlt" – Rechnungen im Entwurfsstatus sind nicht zahlbar, vorher über "Rechnung stellen / mahnen" → "Status setzen (Gestellt/Gemahnt)" auf "gestellt" setzen.
+
+### Personenname: Reihenfolge unterscheidet sich je nach Kontext
+
+In Tabellen erscheint der Name als "Nachname Vorname" (siehe oben), im Rechnungs-Empfängerblock (Adressfeld) dagegen als "Vorname Nachname" (z.B. "E2E AL").

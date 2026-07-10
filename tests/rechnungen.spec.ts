@@ -3,6 +3,7 @@ import { AUTH_FILE } from '../playwright.config';
 
 const GROUP_ID = 584;
 const E2E_FINANZEN_PERSON_ID = 3556;
+const E2E_AL_PERSON_ID = 3552;
 
 async function impersonateFinanzen(page: any) {
   await page.goto(`/groups/${GROUP_ID}/people/${E2E_FINANZEN_PERSON_ID}`);
@@ -98,6 +99,36 @@ test.describe('Rechnungen', () => {
     await stopImpersonation(page);
   });
 
+  test('Zahlung erfassen setzt Rechnungsstatus auf bezahlt (als E2E Finanzen)', async ({ page }) => {
+    await impersonateFinanzen(page);
+
+    const invoiceUrl = await createInvoice(page, 'rechnungen_zahlung');
+
+    // Zahlungen können erst erfasst werden, sobald die Rechnung nicht mehr im
+    // Entwurfsstatus ist. Über "Rechnung stellen" ohne Mailversand auf
+    // "gestellt" setzen (Status "Entwurf" ist nicht in STATES_PAYABLE).
+    await page.locator('.dropdown-toggle', { hasText: 'Rechnung stellen' }).click();
+    await page.getByRole('link', { name: 'Status setzen (Gestellt/Gemahnt)', exact: true }).click();
+    await expect(page.locator('#flash .alert-success')).toContainText(/gestellt/);
+
+    // Zahlung über den vollen Rechnungsbetrag erfassen -> Status wechselt auf "Bezahlt"
+    // Der Toggle-Link und der Submit-Button im Formular heissen beide "Zahlung erstellen".
+    await page.getByRole('link', { name: 'Zahlung erstellen' }).click();
+    await page.getByLabel('Betrag').fill('42.00');
+    await page.locator('#payment').getByRole('button', { name: 'Zahlung erstellen' }).click();
+
+    await expect(page.locator('#flash .alert-success')).toContainText(/Zahlung über 42\.00 wurde erfasst/);
+    // <main> ist hier nur ein leerer Skip-Link-Anker, der eigentliche Inhalt
+    // liegt ausserhalb davon - daher gegen body statt main prüfen.
+    await expect(page.locator('body')).toContainText('Bezahlt');
+    await page.screenshot({ path: 'screenshots/rechnungen_zahlung_bezahlt.png' });
+
+    // Cleanup
+    await page.goto(invoiceUrl);
+    await stornierenAndCleanup(page, 'rechnungen_zahlung');
+    await stopImpersonation(page);
+  });
+
   test('Rechnung per E-Mail senden (als E2E Finanzen)', async ({ page }) => {
     await impersonateFinanzen(page);
 
@@ -115,6 +146,55 @@ test.describe('Rechnungen', () => {
     // Cleanup
     await page.goto(invoiceUrl);
     await stornierenAndCleanup(page, 'rechnungen_mail');
+    await stopImpersonation(page);
+  });
+
+  test('Rechnung direkt auf einer Person erstellen (als E2E Finanzen)', async ({ page }) => {
+    await impersonateFinanzen(page);
+
+    // Auf der Personendetailseite gibt es (bei create_received_invoice- und
+    // Personen-update-Recht) einen direkten "Rechnung erstellen"-Button, der
+    // das Rechnungsformular mit den Empfängerdaten der Person vorausfüllt.
+    // E2E Finanzen braucht dafür zusätzlich zur Finanzrolle eine Rolle mit
+    // layer_and_below_full (z.B. Adressverwalter/-in) in E2E Jungschar, da
+    // die reine Finanzrolle kein Personen-Update-Recht gewährt.
+    // Der Button selbst ist in dieser Umgebung als <a class="disabled"> ohne
+    // href gerendert (Dropdown::InvoiceNew#single_button deaktiviert ihn,
+    // sobald invoice_config.invalid? ist – unabhängig von den Personen-Rechten),
+    // daher direkt auf die Ziel-URL navigieren statt zu klicken.
+    await page.goto(
+      `/groups/${GROUP_ID}/invoices/new` +
+      `?invoice%5Brecipient_id%5D=${E2E_AL_PERSON_ID}&invoice%5Brecipient_type%5D=Person`
+    );
+
+    await expect(page).toHaveURL(/\/invoices\/new/);
+    await expect(page.locator('input[name="invoice[recipient_first_name]"]')).not.toHaveValue('');
+    await expect(page.locator('input[name="invoice[recipient_last_name]"]')).not.toHaveValue('');
+
+    // E2E AL hat keine Adresse hinterlegt, daher wird nur der Name
+    // vorausgefüllt; Adresse muss manuell ergänzt werden. Land ist hier
+    // bereits korrekt auf "Schweiz" vorausgefüllt (kein Tom-Select-Klick nötig).
+    await page.locator('input[name="invoice[recipient_street]"]').fill('Teststrasse');
+    await page.locator('input[name="invoice[recipient_housenumber]"]').fill('1');
+    await page.locator('input[name="invoice[recipient_zip_code]"]').fill('8000');
+    await page.locator('input[name="invoice[recipient_town]"]').fill('Zürich');
+
+    await page.getByLabel('Titel').fill('E2E Test-Rechnung Person');
+    await page.getByRole('link', { name: 'Eintrag hinzufügen' }).click();
+    await page.locator('#invoice_items_fields .fields:visible input[placeholder="Name"]').fill('E2E Testposition');
+    await page.locator('#invoice_items_fields .fields:visible input[placeholder="Preis"]').fill('42.00');
+    await page.locator('#invoice_items_fields .fields:visible input[placeholder="Anzahl"]').fill('1');
+    await page.getByRole('button', { name: 'Speichern' }).first().click();
+    await page.waitForURL(/\/invoices\/\d+/);
+
+    await expect(page.locator('#flash .alert-success')).toContainText(/erstellt/);
+    // Im Rechnungs-Empfängerblock erscheint der Name als "Vorname Nachname"
+    // (anders als in Tabellen). <main> ist auf Rechnungsseiten nur ein
+    // leerer Skip-Link-Anker - gegen body prüfen.
+    await expect(page.locator('body')).toContainText('E2E AL');
+    await page.screenshot({ path: 'screenshots/rechnungen_person_erstellt.png' });
+
+    await stornierenAndCleanup(page, 'rechnungen_person');
     await stopImpersonation(page);
   });
 });

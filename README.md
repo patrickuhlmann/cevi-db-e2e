@@ -30,7 +30,7 @@ Alle Tests basieren auf einer fixen Teststruktur auf dem Integrationssystem:
 
 **E2E Mio Admin** (ID: 3557): Administrator/-in in E2E Mio (Gruppe 582). Wird für Kurs-Tests imitiert.
 
-**E2E Finanzen** (ID: 3556): Person mit Finanz-Berechtigung in E2E Jungschar (Gruppe 584). Wird für Rechnungs-Tests imitiert.
+**E2E Finanzen** (ID: 3556): Person mit Finanz-Berechtigung (Finanzverantwortliche/-r) sowie zusätzlich Adressverwalter/-in in E2E Jungschar (Gruppe 584). Wird für Rechnungs-Tests imitiert. Die zweite Rolle (layer_and_below_full) ist nötig, damit die Person-zu-Person-Rechnungserstellung (Empfänger-Vorausfüllung) funktioniert – die reine Finanzrolle gewährt kein Personen-Update-Recht, das dafür serverseitig verlangt wird.
 
 ## Tests
 
@@ -38,7 +38,7 @@ Alle Tests basieren auf einer fixen Teststruktur auf dem Integrationssystem:
 |---|---|
 | `ortsgruppe-aufbau.spec.ts` | Ortsgruppe mit Untergruppen erstellen und löschen (als Admin) |
 | `abos.spec.ts` | Mailing-List erstellen/löschen, An-/Abmeldung (als E2E AL) |
-| `rechnungen.spec.ts` | Rechnungen erstellen, drucken, stornieren (als E2E Finanzen) |
+| `rechnungen.spec.ts` | Rechnungen erstellen, drucken, per Mail versenden, direkt auf Person erstellen, Zahlung erfassen, stornieren (als E2E Finanzen) |
 | `quick-search.spec.ts` | Schnellsuche nach Personen |
 | `bestandesmeldung.spec.ts` | Bestandesmeldung validieren |
 | `spenderschutz.spec.ts` | Spender-Sichtbarkeitsschutz prüfen |
@@ -54,4 +54,5 @@ Alle bekannten Selektoren, Eigenheiten und Code-Snippets stehen in **CLAUDE.md**
 - **Impersonation**: Benutzer imitieren erfordert danach `storageState` neu speichern (Session-ID rotiert)
 - **Mailing Lists**: Erstellen/Bearbeiten erfordert `layer_full`-Rechte in der Layer der Gruppe – Dachverband-Admin hat diese für Jungschar-Layer nicht, daher Impersonation als E2E AL nötig
 - **Rechnungen**: PDF-Druck ist async (`#file-download-spinner`), Download vor Session-Speicherung via `#cancel_async_downloads` abbrechen
+- **Rechnung direkt auf einer Person**: Der "Rechnung erstellen"-Button auf der Personendetailseite ist in der INTEGRATION-Umgebung als deaktivierter Link (kein `href`) gerendert, da `invoice_config.invalid?` für die Finanzgruppe zutrifft – unabhängig von den Personen-Rechten. Daher direkt auf `/groups/:id/invoices/new?invoice[recipient_id]=...&invoice[recipient_type]=Person` navigieren statt den Button zu klicken.
 - **Spenderschutz**: Personen in Spender-Gruppen sind für normale Admins nicht sichtbar

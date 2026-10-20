@@ -134,6 +134,16 @@ await expect(page).toHaveURL(/\/participations\/\d+/);
 const participationId = page.url().match(/\/participations\/(\d+)/)[1];
 ```
 
+## Kurs/Anlass duplizieren
+
+Der Button "Duplizieren" auf der Detailseite führt auf `/groups/:id/events/new?source_id=<id>` (`EventsController#build_entry` → `Event#duplicate`). Übernommen werden alle Attribute (Name, Kursart, Kontaktperson, Anmeldungs-/Admin-Fragen), **nicht** übernommen werden Daten (`event_dates`), Status, Anmeldefristen und Teilnehmerzahlen. Im Test daher das Startdatum neu setzen; hat die Quelle keine Kontaktperson (z.B. Fixture "E2E API Kurs"), zusätzlich `setEventContact(page)` aufrufen:
+```typescript
+await page.getByRole('link', { name: 'Duplizieren' }).click();
+await expect(page.locator('#event_name')).toHaveValue('E2E API Kurs');
+await page.locator('#event_name').fill('E2E Kurs-Duplikat');
+await setEventContact(page);
+```
+
 ## Kurs-Liste URL
 
 Die Kurs-Liste für eine Gruppe ist unter `/groups/:id/events/course` (collection action), **nicht** `/groups/:id/course`.

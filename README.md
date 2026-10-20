@@ -35,9 +35,9 @@ Alle Tests basieren auf einer fixen Teststruktur auf dem Integrationssystem:
 
 **E2E Finanzen** (ID: 3556): Person mit Finanz-Berechtigung (Finanzverantwortliche/-r) sowie zusätzlich Adressverwalter/-in in E2E Jungschar (Gruppe 584). Wird für Rechnungs-Tests imitiert. Die zweite Rolle (layer_and_below_full) ist nötig, damit die Person-zu-Person-Rechnungserstellung (Empfänger-Vorausfüllung) funktioniert – die reine Finanzrolle gewährt kein Personen-Update-Recht, das dafür serverseitig verlangt wird.
 
-### Fixtures für `api-tests/`
+### Fixtures für `api-tests/` (und `kurs-duplizieren.spec.ts`)
 
-Permanente, manuell angelegte Events (im Gegensatz zu den UI-Tests, die ihre Events selbst erstellen/löschen – siehe `docs/api-testing.md`):
+Permanente, manuell angelegte Events (im Gegensatz zu den UI-Tests, die ihre Events selbst erstellen/löschen – siehe `docs/api-testing.md`). "E2E API Kurs" dient zusätzlich als Quelle für `kurs-duplizieren.spec.ts` (nur gelesen; Name und Kursart GLK1 werden im Test erwartet):
 
 | Fixture | Event-ID | Gruppe | Teilnehmer |
 |---|---|---|---|
@@ -58,6 +58,7 @@ Permanente, manuell angelegte Events (im Gegensatz zu den UI-Tests, die ihre Eve
 | `anlass-anmeldung.spec.ts` | Person (E2E Leiter) für Anlass anmelden und abmelden (als E2E AL) |
 | `kurs.spec.ts` | Kurs erstellen und löschen (als E2E Mio Admin in E2E Mio) |
 | `kurs-anmeldung.spec.ts` | Person (E2E Leiter) für Kurs anmelden und abmelden (als E2E Mio Admin) |
+| `kurs-duplizieren.spec.ts` | Bestehenden Kurs (E2E API Kurs) duplizieren und Duplikat löschen (als E2E Mio Admin) |
 
 ## API-Tests
 

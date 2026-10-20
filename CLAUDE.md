@@ -1,3 +1,4 @@
+* Wenn wir fachliche Änderungen feststellen bitte ein CHANGELOG.md führen und diese kurz dokumentieren. Das ist interessant um Verhaltensänderungen zwischen den Versionen nachzuvollziehen.
 * Neu erstellte Tests jeweils ausführen um sicherzustellen, dass diese funktionieren
 * Der globale Playwright-Timeout ist 60s (`timeout` in `playwright.config.ts`). Das deckt auch mehrphasige Tests (Erstellen → externe Anmeldung → Cleanup) ab; ein eigenes `test.setTimeout()` ist normalerweise nicht nötig. Nur wenn ein einzelner Test deutlich länger braucht, gezielt mit `test.setTimeout(...)` erhöhen.
 * Neue Testpersonen/Testdaten die bereits existieren müssen und nicht selber angelegt werden im README.md beschreiben

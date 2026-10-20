@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { AUTH_FILE } from '../playwright.config';
+import { setEventContact } from './event-form';
 
 const GROUP_ID = 584;           // E2E Jungschar – hier hat der E2E AL (Abteilungsleiter/-in) Rechte
 const E2E_AL_PERSON_ID = 3552;
@@ -39,6 +40,7 @@ test.describe('Anlass', () => {
 
     // Name ausfüllen (allgemein-Tab ist standardmässig aktiv)
     await page.locator('#event_name').fill('E2E Test-Anlass');
+    await setEventContact(page);
 
     // "Daten"-Tab öffnen – die Datum-Felder (type="text", class="date") sind dort versteckt
     await page.locator('a[href="#dates"]').click();

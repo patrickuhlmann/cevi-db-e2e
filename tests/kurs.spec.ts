@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { AUTH_FILE } from '../playwright.config';
+import { setEventContact } from './event-form';
 
 const GROUP_ID = 582;           // E2E Mio – hier hat der E2E Mio Admin Rechte
 const E2E_MIO_ADMIN_PERSON_ID = 3557;
@@ -39,6 +40,7 @@ test.describe('Kurs', () => {
 
     // Name ausfüllen
     await page.locator('#event_name').fill('E2E Test-Kurs');
+    await setEventContact(page);
 
     // Kursart wählen (kind_id ist Pflichtfeld für Kurse)
     const kindSelect = page.locator('#event_kind_id');

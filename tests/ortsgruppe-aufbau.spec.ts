@@ -16,13 +16,16 @@ async function createGroup(page: any, parentId: number, type: string, name: stri
   return parseInt(match[1]);
 }
 
-// Löscht eine Gruppe: Dropdown-Toggle öffnen → "Löschen" klicken
-async function deleteGroup(page: any, groupId: number): Promise<void> {
+// Löscht eine Gruppe: Dropdown-Toggle öffnen → "Löschen" klicken → im Modal
+// den Gruppennamen zur Bestätigung eintippen
+async function deleteGroup(page: any, groupId: number, name: string): Promise<void> {
   await page.goto(`/groups/${groupId}`);
   // Caret des "Bearbeiten"-Dropdowns öffnen
   await page.locator('#dropdown_group_edit a.dropdown-toggle').click();
-  page.once('dialog', (dialog: any) => dialog.accept());
   await page.getByRole('link', { name: /^Löschen$/i }).click();
+  const dialog = page.getByRole('dialog');
+  await dialog.getByRole('textbox').fill(name);
+  await dialog.getByRole('button', { name: 'Gruppen und Rollen definitiv löschen' }).click();
   await expect(page.locator('#flash .alert-success')).toContainText(/gelöscht/);
 }
 
@@ -71,11 +74,11 @@ test.describe('Ortsgruppe Aufbau', () => {
     await page.screenshot({ path: 'screenshots/ortsgruppe_aufbau_hierarchie.png' });
 
     // ── 7. Cleanup: in umgekehrter Reihenfolge löschen ───────────────────────
-    await deleteGroup(page, vorstandId);
-    await deleteGroup(page, stufenId);
-    await deleteGroup(page, jungscharId);
-    await deleteGroup(page, vereinId);
-    await deleteGroup(page, ortsgruppeId);
+    await deleteGroup(page, vorstandId, 'E2E Test-Vorstand');
+    await deleteGroup(page, stufenId, 'E2E Test-Stufe');
+    await deleteGroup(page, jungscharId, 'E2E Test-Jungschar');
+    await deleteGroup(page, vereinId, 'E2E Test-Verein');
+    await deleteGroup(page, ortsgruppeId, 'E2E Test-Ortsgruppe');
     await page.screenshot({ path: 'screenshots/ortsgruppe_aufbau_geloescht.png' });
   });
 });

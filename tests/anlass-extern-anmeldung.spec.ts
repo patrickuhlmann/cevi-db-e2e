@@ -1,5 +1,6 @@
 import { test, expect, Cookie } from '@playwright/test';
 import { AUTH_FILE } from '../playwright.config';
+import { setEventContact } from './event-form';
 
 const GROUP_ID = 584;           // E2E Jungschar – hier hat der E2E AL Rechte
 const E2E_AL_PERSON_ID = 3552;
@@ -24,6 +25,7 @@ async function createEventWithExternalApplications(page: any): Promise<number> {
   await expect(page).toHaveURL(/\/events\/new/);
 
   await page.locator('#event_name').fill('E2E Externer Anmeldungs-Anlass');
+  await setEventContact(page);
 
   // Daten: Startdatum
   await page.locator('a[href="#dates"]').click();
@@ -58,6 +60,12 @@ async function createEventWithExternalApplications(page: any): Promise<number> {
 }
 
 test.describe('Externe Anlass-Anmeldung', () => {
+  test.afterEach(async ({ page }) => {
+    if (await page.locator('.user-impersonation').isVisible()) {
+      await stopImpersonation(page);
+    }
+  });
+
   test('Externe Person meldet sich für einen Anlass mit externer Anmeldung an', async ({ page }) => {
     // === Phase 1: Anlass erstellen (als E2E AL) ===
     await impersonateAL(page);

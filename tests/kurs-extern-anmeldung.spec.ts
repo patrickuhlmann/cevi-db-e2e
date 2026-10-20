@@ -1,5 +1,6 @@
 import { test, expect, Cookie } from '@playwright/test';
 import { AUTH_FILE } from '../playwright.config';
+import { setEventContact } from './event-form';
 
 const GROUP_ID = 582;               // E2E Mio
 const E2E_MIO_ADMIN_PERSON_ID = 3557;
@@ -25,6 +26,7 @@ async function createCourseWithExternalApplications(page: any): Promise<number> 
 
   // Allgemein: Name, Kursart, Status "Offen zur Anmeldung"
   await page.locator('#event_name').fill('E2E Externer Anmeldungs-Kurs');
+  await setEventContact(page);
   await page.locator('#event_kind_id').selectOption({ index: 1 });
   await page.locator('#event_state').selectOption('application_open');
 
@@ -56,6 +58,12 @@ async function createCourseWithExternalApplications(page: any): Promise<number> 
 }
 
 test.describe('Externe Kurs-Anmeldung', () => {
+  test.afterEach(async ({ page }) => {
+    if (await page.locator('.user-impersonation').isVisible()) {
+      await stopImpersonation(page);
+    }
+  });
+
   test('Externe Person meldet sich für einen Kurs mit externer Anmeldung an', async ({ page }) => {
     // === Phase 1: Kurs erstellen (als E2E Mio Admin) ===
     await impersonateMioAdmin(page);

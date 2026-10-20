@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { AUTH_FILE } from '../playwright.config';
+import { setEventContact } from './event-form';
 
 const GROUP_ID = 582;               // E2E Mio
 const E2E_MIO_ADMIN_PERSON_ID = 3557;
@@ -25,6 +26,7 @@ async function createTestCourse(page: any): Promise<number> {
   await expect(page).toHaveURL(/\/events\/new/);
 
   await page.locator('#event_name').fill('E2E Anmeldung-Kurs');
+  await setEventContact(page);
   await page.locator('#event_kind_id').selectOption({ index: 1 });
 
   await page.locator('a[href="#dates"]').click();

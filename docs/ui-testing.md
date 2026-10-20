@@ -11,11 +11,13 @@ await page.locator('#group_name').fill(name);
 
 ## Gruppe löschen
 
-Der Löschen-Link ist im "Bearbeiten"-Dropdown versteckt, das nur ein Caret-Toggle (kein sichtbarer Text) hat. Erst Toggle öffnen, dann Löschen klicken:
+Der Löschen-Link ist im "Bearbeiten"-Dropdown versteckt, das nur ein Caret-Toggle (kein sichtbarer Text) hat. Erst Toggle öffnen, dann Löschen klicken. Seit Release 2026-10 erscheint danach **kein** nativer `confirm()` mehr, sondern ein Bootstrap-Modal, in dem der Gruppenname zur Bestätigung eingetippt werden muss (der Button bleibt sonst `disabled`):
 ```typescript
 await page.locator('#dropdown_group_edit a.dropdown-toggle').click();
-page.once('dialog', (dialog) => dialog.accept());
 await page.getByRole('link', { name: /^Löschen$/i }).click();
+const dialog = page.getByRole('dialog');
+await dialog.getByRole('textbox').fill(groupName);
+await dialog.getByRole('button', { name: 'Gruppen und Rollen definitiv löschen' }).click();
 ```
 
 ## Seitentitel
@@ -42,7 +44,9 @@ await expect(page.locator('#main').getByRole('link', { name: 'Gruppenname' })).t
 
 ## Bestätigungsdialoge
 
-Hitobito verwendet native Browser-`confirm()`-Dialoge (via Turbo `data-confirm`):
+Hitobito verwendet für die meisten Löschaktionen (Anlässe, Teilnahmen, Abos) native Browser-`confirm()`-Dialoge (via Turbo `data-confirm`). Ausnahme: Gruppen löschen (eigenes Modal, siehe oben).
+
+**Achtung:** Läuft ein `page.once('dialog', …)` ins Leere, weil stattdessen ein Modal erscheint, gibt es keinen Fehler – der Test scheitert erst an der nachfolgenden Flash-Assertion.
 ```typescript
 page.once('dialog', (dialog) => dialog.accept());
 await page.getByRole('link', { name: /Löschen/i }).click();
@@ -72,6 +76,26 @@ await page.locator('a[href="#dates"]').click();
 const startAtInput = page.locator('input[id$="_start_at_date"]').first();
 await startAtInput.pressSequentially('01.06.2026');
 await startAtInput.blur();
+```
+
+## Anlass-/Kurs-Formular: Kontaktperson mit E-Mail ist Pflicht
+
+Seit Release 2026-10 (hitobito_cevi `cb750ab`, `Cevi::Event#assert_contact_with_valid_email`) braucht jeder Anlass und Kurs eine Kontaktperson **mit E-Mail-Adresse** (wird als Reply-To für Anlass-Mails verwendet). Ohne sie: "Kontaktperson mit gültiger E-Mail-Adresse muss vorhanden sein, …". Das Feld "Kontaktperson" im Tab "Allgemein" ist ein Personen-Autocomplete (`data-provide="entity"`) mit verstecktem `#event_contact_id`. Wie bei der Personenauswahl unten direkt das versteckte Feld setzen – Helper `setEventContact(page)` in `tests/event-form.ts`:
+```typescript
+await page.locator('#event_name').fill('…');
+await setEventContact(page);
+```
+Als Kontakt wird immer E2E AL (3552, hat E-Mail) gesetzt, auch bei Kursen – E2E Mio Admin hat **keine** E-Mail-Adresse.
+
+## Imitation im `afterEach` beenden
+
+Jeder Spec, der imitiert, braucht ein `afterEach`, das die Imitation beendet. Scheitert ein Test während der Imitation, bleibt sonst die gespeicherte Session (`AUTH_FILE`) serverseitig im imitierten Zustand, und **alle folgenden Tests** schlagen fehl (z.B. "Imitieren"-Link nicht gefunden, fehlende Rechte) – ein einzelner echter Fehler sieht dann aus wie viele:
+```typescript
+test.afterEach(async ({ page }) => {
+  if (await page.locator('.user-impersonation').isVisible()) {
+    await stopImpersonation(page);
+  }
+});
 ```
 
 ## Anlass-Formular: Globale Fragen (Anmeldungsangaben-Tab)

@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { AUTH_FILE } from '../playwright.config';
+import { setEventContact } from './event-form';
 
 const GROUP_ID = 584;           // E2E Jungschar – hier hat der E2E AL Rechte
 const E2E_AL_PERSON_ID = 3552;
@@ -26,6 +27,7 @@ async function createTestEvent(page: any): Promise<number> {
   await expect(page).toHaveURL(/\/events\/new/);
 
   await page.locator('#event_name').fill('E2E Anmeldung-Test');
+  await setEventContact(page);
 
   await page.locator('a[href="#dates"]').click();
   const startAtInput = page.locator('input[id$="_start_at_date"]').first();

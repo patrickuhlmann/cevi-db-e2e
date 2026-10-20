@@ -19,7 +19,7 @@ jobs:
     outputs:
       playwright-image: ${{ steps.version.outputs.image }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Playwright-Version ermitteln
         id: version
         run: |

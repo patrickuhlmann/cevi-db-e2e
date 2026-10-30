@@ -37,7 +37,7 @@ Alle Tests basieren auf einer fixen Teststruktur auf dem Integrationssystem:
 
 **E2E Finanzen** (ID: 3556): Person mit Finanz-Berechtigung (Finanzverantwortliche/-r) sowie zusätzlich Adressverwalter/-in in E2E Jungschar (Gruppe 584). Wird für Rechnungs-Tests imitiert. Die zweite Rolle (layer_and_below_full) ist nötig, damit die Person-zu-Person-Rechnungserstellung (Empfänger-Vorausfüllung) funktioniert – die reine Finanzrolle gewährt kein Personen-Update-Recht, das dafür serverseitig verlangt wird.
 
-**Kursart "MIRA BK"** (ID: 8, global unter `/event_kinds`): Vergibt Teilnehmenden die Qualifikation "MIRA Basiskurs". Wird in `qualifikation-kommentar.spec.ts` verwendet, weil die Qualifikationsseite eines Kurses nur bei einer qualifizierenden Kursart existiert (die übrigen Kurs-Tests verwenden die erste Kursart, die nichts vergibt).
+**Kursart "MIRA BK"** (ID: 8, global unter `/event_kinds`): Vergibt Teilnehmenden die Qualifikation "MIRA Basiskurs". Wird in `qualifikation-kommentar.spec.ts` verwendet, weil die Qualifikationsseite eines Kurses nur bei einer qualifizierenden Kursart existiert. Sie vergibt genau eine Qualifikation und keine Verlängerungen.
 
 ### Fixtures für `api-tests/` (und `kurs-duplizieren.spec.ts`, `eventvorlagen.spec.ts`)
 

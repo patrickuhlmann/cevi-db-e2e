@@ -256,3 +256,24 @@ await fields.locator('input[name$="[street]"]').fill('Bahnhofstrasse');
 - **"Bezeichnung" (`[label]`) wird beim Speichern verworfen** (Strong-Params-Fehler in hitobito, hitobito/hitobito#4609). Testeinträge darum nicht über die Bezeichnung, sondern z.B. über die Strasse identifizieren.
 - Entfernen: in der Zeile (`.labeled.controls`) den Link `.remove_nested_fields` klicken und speichern.
 - Anzeige: im ersten `<address>` als `"<Name>, <Strasse Nr>, <PLZ Ort>"`, gefolgt von der Kategorie (nur Kategorie, keine Bezeichnung) – direkt nach der Hauptadresse und vor den E-Mail-Adressen.
+
+## Kanton (Person, Hauptadresse)
+
+Seit hitobito_oeku#12 ein Core-Attribut der Person. Das Feld `#person_canton` (Tom-Select) steckt in einem `field-visibility`-Container, der nur bei Land `CH` sichtbar ist; beim Wechsel auf ein anderes Land wird der Kanton per JS geleert. Sichtbarkeit über das Label prüfen: `label[for="person_canton-ts-control"]`. Kantonswerte sind Kleinbuchstaben-Kürzel (`ag`, `be`, …).
+
+Die E2E-Personen haben **kein Land** gesetzt (leer), dann ist das Kantonsfeld ausgeblendet, obwohl hitobito eine Person ohne Land als Schweizer behandelt (Bug, siehe CHANGELOG). Tests sollten am Schluss das Land wieder leeren.
+
+Detailseite: Die Zeile "Kanton" (Cevi-Angaben) wird **immer** gerendert, ohne Wert mit leerem `<dd>`. Darum den Wert prüfen, nicht die Existenz der Zeile:
+```typescript
+const canton = page.locator('dt', { hasText: /^Kanton$/ }).locator('xpath=following-sibling::dd[1]');
+await expect(canton).toHaveText('Aargau');
+```
+
+## Tom-Select: Auswahl ändern, wenn schon ein Wert gewählt ist
+
+Das innere Input `#<id>-ts-control` ist nur klickbar, solange noch nichts gewählt ist. Danach schlägt der Klick fehl ("element is outside of the viewport"). Immer den umgebenden Container klicken:
+```typescript
+await page.locator(`.ts-control:has(#${selectId}-ts-control)`).click();
+await page.locator(`#${selectId}-ts-dropdown [data-value="DE"]`).first().click();
+```
+Auswahl leeren (löst das `change`-Event aus wie eine Benutzereingabe): `await page.locator('#person_country').evaluate((el: any) => el.tomselect.clear());`

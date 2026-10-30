@@ -401,3 +401,7 @@ Als Kontaktperson ohne E-Mail eignet sich E2E Mami (3553), sie ist für E2E AL s
 - Gruppen-Reiter "Ausbildung": `/groups/:id/educations` (Plural). Standardmässig nur direkte Mitglieder der Gruppe, bei E2E Jungschar also E2E AL und E2E Finanzen. Sortier-Links in `#main table th a` ("Person", "Qualifikationen", "Geburtstag"), erster Klick `sort_dir=asc`, zweiter `desc`. Namen in der ersten Spalte als "Nachname Vorname".
 - Qualifikation direkt bei einer Person: `/groups/:gid/people/:id/qualifications/new`, Felder `#qualification_qualification_kind_id` und `#qualification_start_at`. Das Ende wird aus der Gültigkeit der Art berechnet (Ende Jahr, z.B. "Quali SiBe-Test" ab 01.01.2026 → "bis 31.12.2030"). Löschen auf der Personenseite in der Tabelle "Qualifikationen" über `a[data-method="delete"]` mit nativem `confirm()`.
 - Geburtstag: `#person_birthday` (Text, `DD.MM.YYYY`), leeren mit `fill('')`.
+
+## E-Mail-Validierung: Haupt-E-Mail bestehender Personen nicht mit ungültigen Werten testen
+
+Eine ungültige Haupt-E-Mail wird bei einer bestehenden Person **gespeichert**, solange die alte gültig war (siehe CHANGELOG, Bug in `Person#valid_email?`). Ein Test damit verändert die Login-Adresse der Testperson. Die Validierung darum über weitere E-Mails oder über eine neue Person (`/groups/:id/roles/new` → "Neue Person erfassen", `#role_new_person_email`) prüfen. Dort ist nach einem Fehler nichts angelegt. Das Feld `type="email"` lässt `a..b@x.ch` und `a.@x.ch` im Browser durch.

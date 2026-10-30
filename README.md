@@ -82,6 +82,7 @@ Permanente, manuell angelegte Events (im Gegensatz zu den UI-Tests, die ihre Eve
 | `personennummer.spec.ts` | Personennummer von E2E AL auf der Detailseite und als erste Spalte im CSV-Export "Alle Angaben" (als Admin) |
 | `kontaktangaben-kategorien.spec.ts` | Bei E2E Leiter Telefonnummer (mit Ergänzung) und weitere E-Mail mit Kategorie "Mutter" erfassen, Anzeige und Spalten im CSV-Export "Alle Angaben" prüfen, zweite Telefonnummer "Mutter" wird abgelehnt, Einträge entfernen (als Admin) |
 | `ausbildung-sortierung.spec.ts` | Ausbildungs-Liste von E2E Jungschar nach Person, Qualifikationen und Geburtstag auf- und absteigend sortieren; E2E AL und E2E Finanzen bekommen dafür vorübergehend einen Geburtstag und die Qualifikation "Quali SiBe-Test" (als Admin) |
+| `email-validierung.spec.ts` | E-Mail-Adressen mit `..` bzw. Punkt vor dem `@`: weitere E-Mail bei E2E Leiter und neue Person in E2E Team werden abgelehnt (als Admin). Haupt-E-Mail bestehender Personen nicht getestet (Bug, würde die Adresse speichern) |
 | `unsichtbar-von-oben.spec.ts` | E2E OG Admin (Administrator/-in Cevi DB in E2E Ortsgruppe, imitiert) sieht E2E Kind, das für den Admin unsichtbar ist, bearbeitet Ceviname und Rollen-Bezeichnung und kann Verwalter*innen zuweisen; Änderungen werden zurückgesetzt |
 | `csv-import.spec.ts` | CSV-Import in E2E Team mit Personennummer: E2E Leiter über die ID aktualisieren, neue Person mit vorgegebener ID erstellen und löschen, Abbruch bei doppelter ID (als Admin); keine ID-Zuordnung ohne Admin-Recht (als E2E AL) |
 

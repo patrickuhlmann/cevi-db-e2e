@@ -361,3 +361,8 @@ Als Kontaktperson ohne E-Mail eignet sich E2E Mami (3553), sie ist für E2E AL s
 - **Lauf löschen:** In `/invoice_runs` das Icon `a[title="Löschen"]` öffnet ein Modal "Rechnungslauf löschen", dort "Löschen". Geht nur, solange alle Rechnungen des Laufs Entwürfe oder storniert sind.
 - **Herkunfts-Filter:** Checkboxen `getByRole('checkbox', { name: 'Einzelrechnungen' | 'aus Rechnungsläufen' | 'aus Sammelrechnungen' })` (Parameter `standalone`, `from_standalone_invoice_run`, `from_template_invoice_run`), mit `data-submit`, d.h. `check()`/`uncheck()` lädt die Liste neu. Sie erscheinen nur, wenn die Gruppe Rechnungen von mehr als einer Herkunft hat.
 - Die Filter landen in der Session (`remember_params`) und werden bei `?returning=true` wiederhergestellt. Specs öffnen die Liste darum mit beiden Parametern explizit (`?standalone=1&from_standalone_invoice_run=1`), damit ein abgebrochener Lauf keinen Filter hinterlässt.
+
+## Rechnungseinstellungen: Zahlungsschnittstellen (EBICS)
+
+- Formular `/groups/:id/invoice_config/edit` (E2E Finanzen für E2E Jungschar), Tab `a[href="#payment_provider_configs"]`. Pro Bank ein `fieldset` mit `legend` "Zahlungsschnittstelle - <Bank> (EBICS 3.0)" bzw. "(EBICS 2.5)", Felder Teilnehmer-ID, Partner-ID und Passwort sowie das versteckte `[legacy_25_ebics]` (`false` = 3.0). Banknamen wie in hitobito, z.B. "Postfinance" (nicht "PostFinance").
+- Der Test speichert bewusst nicht. Ein gesetztes Passwort oder eine Teilnehmer-ID würde eine echte EBICS-Initialisierung anstossen.

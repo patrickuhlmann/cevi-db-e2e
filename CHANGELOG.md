@@ -2,7 +2,7 @@
 
 Fachliche Verhaltensänderungen von cevi.db (hitobito), die beim Anpassen der E2E-Tests aufgefallen sind.
 
-## Release 2026-11 (hitobito `45c2ca9f`, hitobito_cevi `7f3fce3`, hitobito_youth `08df1d7`)
+## Release 2026-11 (hitobito `45c2ca9f`, hitobito_cevi `8348b8cd`, hitobito_youth `08df1d7f`)
 
 - **Zusätzliche Adressen für Personen und Gruppen sind aktiviert** (hitobito/hitobito#4471). Im Bearbeiten-Formular (bei Gruppen im Tab "Kontaktangaben") gibt es den neuen Block "Weitere Adressen" mit Kategorie (Person: Arbeit/Rechnungsadresse/Andere, Gruppe: Rechnungsadresse/Andere), Öffentlich-Checkbox, "Namen übernehmen" und Adressfeldern. Auf der Detailseite erscheinen sie direkt nach der Hauptadresse, vor den E-Mail-Adressen, mit der Kategorie darunter.
 - **Kanton ist ein Core-Attribut der Person** (hitobito_oeku#12, hitobito/hitobito#4481, hitobito_cevi `85ad745`). Statt des bisherigen Cevi-eigenen Feldes gibt es eine Auswahlliste der 26 Kantone, die im Formular nur bei der Hauptadresse und nur bei Land "Schweiz" erscheint. Wird ein anderes Land gewählt, wird der Kanton geleert. Zusätzliche Adressen und Gruppen haben keinen Kanton. Auf der Personen-Detailseite (Cevi-Angaben) steht die Zeile "Kanton" weiterhin, ohne Wert leer. Bestehende Werte wurden migriert (Freitext → Kürzel, ungültige Werte gelöscht, fehlende per PLZ ergänzt).
@@ -21,6 +21,21 @@ Fachliche Verhaltensänderungen von cevi.db (hitobito), die beim Anpassen der E2
 - **Initiale Sichtbarkeit von Hilfetexten** (hitobito/hitobito#2686, hitobito `b6bd589a`). Im Hilfetext-Formular (Einstellungen → Hilfetexte) gibt es die Checkbox "Text initial Anzeigen", in der Liste die Spalte "initial Anzeigen" (ja/nein). Mit der Option steht der Hilfetext beim Laden der Seite offen da, sonst ist er wie bisher versteckt und erscheint per Klick auf das Info-Icon. Standard ist versteckt, bestehende Hilfetexte bleiben versteckt.
 - **Kein Effekt für die Cevi: Rollentyp bei der API-Selbstregistrierung** (hitobito_bdp#38). Der wählbare Rollentyp ist ein eigener Endpunkt im Wagon hitobito_bdp/pfadi_de. Im Core gibt es nur einen Umbau von `TokenAbility` (`da477c7a`), `/api/self_registration` vergibt weiterhin die Rolle aus der Gruppeneinstellung. Nicht getestet.
 - **Bekannter Fehler:** Die freie "Bezeichnung" einer zusätzlichen Adresse wird beim Speichern verworfen – `Contactable::ACCESSIBLE_ATTRS` erlaubt noch `:translated_label` statt `:label` (Überbleibsel aus hitobito/hitobito#4359, gemeldet als hitobito/hitobito#4609).
+
+### Weitere Änderungen, nicht in den Release Notes (aus dem Code, nicht getestet)
+
+Abgeglichen mit den Commits seit Release 2026-10 (hitobito `3b88f1a4`, hitobito_cevi `e96ec777`, hitobito_youth `98b6deb0`).
+
+- **Berechtigung `see_invisible_from_above` gibt keine Schreibrechte mehr** (hitobito_pbs#473, hitobito `ee03a4f8`/`e999ecbe`, hitobito_cevi `e444acd`). Betrifft in der Cevi die Rollen mit dieser Berechtigung in Ortsgruppe und Geschäftsstelle der Mitgliederorganisation. Sie sehen Personen mit "nicht sichtbar für übergeordnete Ebenen" weiterhin, bearbeiten (Person, Rollen, Verwalter, provisorische Anmeldung) dürfen sie sie nur noch mit `layer_and_below_full` in der betreffenden Ebene. Die Wirkung gilt zudem nur noch nach unten in der Gruppenhierarchie.
+- **Bestandesmeldung bearbeiten neu umgesetzt** (hitobito_cevi `55a4959`, hitobito#4470). Das Formular zum Bearbeiten der Mitgliederzahlen ist ein neues verschachteltes Formular.
+- **Kategorien statt freier Bezeichnungen bei weiteren E-Mails, Telefonnummern, Adressen und Social Media** (hitobito#4359). hitobito_youth ergänzt die Kategorien Mutter, Vater (Telefon und E-Mail) und Eltern (nur E-Mail). Bestehende Bezeichnungen "Mutter"/"Vater"/"Eltern" werden darauf migriert. Der Personen-Export hat dadurch andere Spalten.
+- **Ausbildungs-Liste sortierbar** nach Name, Qualifikation und Geburtstag (hitobito_youth `365737a`, hitobito_sac_cas#2613).
+- **Firmenfelder** (Firma/Firmenname) sind per Feature-Gate `address.company` ausblendbar, in der Cevi weiterhin sichtbar (#4471).
+- **Rechnungen:** Zahlungsinformation, Rechnungsvorlagen und -artikel übersetzbar, Rechnungen in der Sprache der Empfänger (sww#413). Originalrechnung einer gemahnten Rechnung zeigt wieder das ursprüngliche Fälligkeitsdatum (sww#378). Rechnungen auch ohne Strasse/Postfach (sww#349). Mahnungstexte ohne Längenbegrenzung (sww#414). Nach dem Stornieren bleibt man auf der Rechnung, Versand-/Mahn-Aktionen sind dort ausgeblendet. Der Reiter "Rechnungen" der Gruppe erscheint nur noch mit Berechtigung. SZKB als EBICS-Bank (#4400).
+- **Kontaktperson von Anlässen:** Anmeldebestätigung (PDF), Teilnahme-Detailseite, Teilnahme-Mails und iCal zeigen nur die in den Anzeigeoptionen gewählten Angaben (sww#376).
+- **Weitere:** Browser-Autofill in Personen- und Gruppenformular deaktiviert (#4445). E-Mail-Adressen mit `..` oder `.` vor dem `@` sind ungültig. Alphanumerische PLZ und führende Nullen bei Gruppen erlaubt (pfadi_de#86). Fehlender 2FA-Code zählt als falscher Code. API-Keys: Berechtigungen korrekt angezeigt, Token nur noch auf der Detailseite (#3029).
+- **JSON:API:** Rollen- und Gruppentypen ohne Authentisierung abrufbar (#4488). `include=contact_details` bei Anlässen (sww#376). Service-Tokens mit `event_participations` dürfen Teilnahmedetails lesen (pbs#466). Hintergrund-Exporte über die API werden abgelehnt.
+- **In der Cevi nicht aktiv (Feature-Gate aus):** Dokumente für Personen (#4201, `personal_documents`), Blocklist (pfadi_de#61, `people.blocklist`).
 
 ## Release 2026-10 (hitobito `3b88f1a4`, hitobito_cevi `e96ec777`, hitobito_youth `98b6deb0`)
 

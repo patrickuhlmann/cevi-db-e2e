@@ -395,3 +395,9 @@ Als Kontaktperson ohne E-Mail eignet sich E2E Mami (3553), sie ist für E2E AL s
 - Die Optionen der Kategorie stehen im `<template>` des Nested-Forms; dessen Inhalt ist nicht im DOM. Optionen darum erst nach "Eintrag hinzufügen" in der neuen Zeile prüfen.
 - Telefonnummern werden beim Speichern normalisiert (`079 000 00 01` → `+41 79 000 00 01`). Bestehende Einträge im Formular haben diesen Wert als `value`-Attribut, darüber lassen sie sich finden.
 - Detailseite: `"<Wert> <Kategorie>, <Ergänzung>"`. Im CSV-Export steht vor Telefonnummern ein `'` (Schutz vor Formel-Injection).
+
+## Ausbildungs-Liste und Qualifikationen von Personen
+
+- Gruppen-Reiter "Ausbildung": `/groups/:id/educations` (Plural). Standardmässig nur direkte Mitglieder der Gruppe, bei E2E Jungschar also E2E AL und E2E Finanzen. Sortier-Links in `#main table th a` ("Person", "Qualifikationen", "Geburtstag"), erster Klick `sort_dir=asc`, zweiter `desc`. Namen in der ersten Spalte als "Nachname Vorname".
+- Qualifikation direkt bei einer Person: `/groups/:gid/people/:id/qualifications/new`, Felder `#qualification_qualification_kind_id` und `#qualification_start_at`. Das Ende wird aus der Gültigkeit der Art berechnet (Ende Jahr, z.B. "Quali SiBe-Test" ab 01.01.2026 → "bis 31.12.2030"). Löschen auf der Personenseite in der Tabelle "Qualifikationen" über `a[data-method="delete"]` mit nativem `confirm()`.
+- Geburtstag: `#person_birthday` (Text, `DD.MM.YYYY`), leeren mit `fill('')`.

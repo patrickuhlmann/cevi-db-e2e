@@ -325,3 +325,15 @@ Ablauf: `/groups/:id/csv_imports/new` → Datei per `setInputFiles` (Buffer, Tre
 - Antworten erfassen: Teilnahme bearbeiten (`…/participations/:id/edit`), Freitext-Antworten über `getByLabel('<Fragetext>')`.
 - Zweite Rolle für eine Person, die schon teilnimmt (`roles/new?event_role[person_id]=…`): Die Rolle wird zur bestehenden Teilnahme hinzugefügt, die Weiterleitung geht dann auf die **Teilnehmerliste**, nicht auf die Teilnahme.
 - Imitieren über `/people/:id` (leitet auf die Hauptgruppe weiter), dann muss die Gruppe der Person nicht bekannt sein. E2E Mami kann der Admin wie E2E Kind nicht sehen und darum nicht imitieren.
+
+## Validierungsfehler mehrmals hintereinander prüfen
+
+Ein Formular, das nach einem Validierungsfehler erneut abgeschickt wird, zeigt die alte Fehlermeldung, bis die Antwort neu gerendert ist. `expect(...).toContainText(<Fehler>)` ist dann sofort erfüllt, und die nächsten Eingaben landen noch auf der alten Seite (z.B. gesetzte `#event_contact_id` geht verloren). Darum beim Speichern auf die POST-Antwort warten:
+```typescript
+await Promise.all([
+  page.waitForResponse((response) => response.request().method() === 'POST'),
+  page.getByRole('button', { name: 'Speichern' }).first().click(),
+]);
+await page.waitForLoadState('networkidle');
+```
+Als Kontaktperson ohne E-Mail eignet sich E2E Mami (3553), sie ist für E2E AL sichtbar. E2E Mio Admin hat zwar auch keine E-Mail, darf von E2E AL aber nicht gesehen werden ("Kontaktperson Zugriff verweigert").

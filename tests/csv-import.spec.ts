@@ -123,7 +123,7 @@ test.describe('CSV-Import mit Personennummer', () => {
     await importNow(page);
     await expect(page.locator('#flash .alert-danger')).toContainText(`ID mehrmals vergeben: ${E2E_LEITER_PERSON_ID}`);
     // Nichts importiert (die Erfolgsmeldung "1 Person … wurde erfolgreich aktualisiert"
-    // erscheint trotzdem – Bug, siehe CHANGELOG)
+    // erscheint trotzdem – Bug hitobito/hitobito#4611)
     await page.goto(`/groups/${TEAM_GROUP_ID}/people/${E2E_LEITER_PERSON_ID}`);
     await expect(profession(page)).toHaveText('');
   });

@@ -27,7 +27,7 @@ Alle Tests basieren auf einer fixen Teststruktur auf dem Integrationssystem:
 | &nbsp;&nbsp;&nbsp;&nbsp;├ E2E Eltern | Untergruppe | Person: E2E Mami |
 | &nbsp;&nbsp;&nbsp;&nbsp;├ E2E Fröschli (ID: 586) | Untergruppe | Person: E2E Kind (ID: 3554) |
 | &nbsp;&nbsp;&nbsp;&nbsp;├ E2E Spender (ID: 588) | Untergruppe | 1 Spender (versteckt) |
-| &nbsp;&nbsp;&nbsp;&nbsp;└ E2E Team | Untergruppe | Person: E2E Leiter, E2E AL (ID: 3552) |
+| &nbsp;&nbsp;&nbsp;&nbsp;└ E2E Team (ID: 585) | Untergruppe | Person: E2E Leiter (ID: 3550, Rolle Mitarbeiter/-in), E2E AL (ID: 3552) |
 
 **E2E Admin** (e2e-cevidb@cevimail.ch): Administrator auf Ebene Cevi Schweiz (Dachverband).
 
@@ -64,6 +64,7 @@ Permanente, manuell angelegte Events (im Gegensatz zu den UI-Tests, die ihre Eve
 | `zusaetzliche-adressen.spec.ts` | Zusätzliche Adresse bei Person (E2E AL) und Gruppe (E2E Jungschar) erfassen, Anzeige prüfen und wieder entfernen (als Admin) |
 | `kanton.spec.ts` | Kanton bei E2E AL: Feld nur bei Land Schweiz, speichern/anzeigen, bei Ausland geleert; kein Kanton bei zusätzlichen Adressen (als Admin) |
 | `personennummer.spec.ts` | Personennummer von E2E AL auf der Detailseite und als erste Spalte im CSV-Export "Alle Angaben" (als Admin) |
+| `csv-import.spec.ts` | CSV-Import in E2E Team mit Personennummer: E2E Leiter über die ID aktualisieren, neue Person mit vorgegebener ID erstellen und löschen, Abbruch bei doppelter ID (als Admin); keine ID-Zuordnung ohne Admin-Recht (als E2E AL) |
 
 ## API-Tests
 

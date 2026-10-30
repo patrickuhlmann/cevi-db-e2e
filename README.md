@@ -80,6 +80,7 @@ Permanente, manuell angelegte Events (im Gegensatz zu den UI-Tests, die ihre Eve
 | `zusaetzliche-adressen.spec.ts` | Zusätzliche Adresse bei Person (E2E AL) und Gruppe (E2E Jungschar) erfassen, Anzeige prüfen und wieder entfernen (als Admin) |
 | `kanton.spec.ts` | Kanton bei E2E AL: Feld nur bei Land Schweiz, speichern/anzeigen, bei Ausland geleert; kein Kanton bei zusätzlichen Adressen (als Admin) |
 | `personennummer.spec.ts` | Personennummer von E2E AL auf der Detailseite und als erste Spalte im CSV-Export "Alle Angaben" (als Admin) |
+| `kontaktangaben-kategorien.spec.ts` | Bei E2E Leiter Telefonnummer (mit Ergänzung) und weitere E-Mail mit Kategorie "Mutter" erfassen, Anzeige und Spalten im CSV-Export "Alle Angaben" prüfen, zweite Telefonnummer "Mutter" wird abgelehnt, Einträge entfernen (als Admin) |
 | `unsichtbar-von-oben.spec.ts` | E2E OG Admin (Administrator/-in Cevi DB in E2E Ortsgruppe, imitiert) sieht E2E Kind, das für den Admin unsichtbar ist, bearbeitet Ceviname und Rollen-Bezeichnung und kann Verwalter*innen zuweisen; Änderungen werden zurückgesetzt |
 | `csv-import.spec.ts` | CSV-Import in E2E Team mit Personennummer: E2E Leiter über die ID aktualisieren, neue Person mit vorgegebener ID erstellen und löschen, Abbruch bei doppelter ID (als Admin); keine ID-Zuordnung ohne Admin-Recht (als E2E AL) |
 

@@ -388,3 +388,10 @@ Als Kontaktperson ohne E-Mail eignet sich E2E Mami (3553), sie ist für E2E AL s
 - Formular: Tabelle `#current_member_counts_fields`, eine `tr.fields` pro Jahrgang, Felder `input[name$="[born_in]"]` (nur bei neuen Zeilen), `[person_f]`, `[person_m]`. Neue Zeile über "Eintrag hinzufügen". Der Submit-Button heisst "Gruppe aktualisieren", nicht "Speichern".
 - Anzeige: Zeile pro Jahrgang mit den Zellen Jahrgang, w, m, Total und einer leeren Aktionszelle; 0 erscheint als "-". "Löschen" entfernt alle Zahlen des Jahres (Flash "Die Mitgliederzahlen für <Jahr> wurden erfolgreich gelöscht.").
 - Bei einem ungültigen Wert antwortet der Server mit 200 statt 422. Turbo verwirft die Antwort, es erscheint **keine** Fehlermeldung. Im Test auf die POST-Antwort warten und danach prüfen, dass nichts gespeichert wurde.
+
+## Telefonnummern und weitere E-Mails (Kategorien)
+
+- Nested-Forms im Personenformular: `.nested-form[data-nested-form-assoc-value="phone_numbers"]` bzw. `"additional_emails"`. Eine Zeile ist `.fields`, Felder `input[name$="[number]"]` / `[email]`, `select[name$="[category_id]"]` (Kategorie per `selectOption({ label: 'Mutter' })`) und `input[name$="[label]"]` (Platzhalter "Ergänzungen"). Entfernen über `.remove_nested_fields` in der Zeile.
+- Die Optionen der Kategorie stehen im `<template>` des Nested-Forms; dessen Inhalt ist nicht im DOM. Optionen darum erst nach "Eintrag hinzufügen" in der neuen Zeile prüfen.
+- Telefonnummern werden beim Speichern normalisiert (`079 000 00 01` → `+41 79 000 00 01`). Bestehende Einträge im Formular haben diesen Wert als `value`-Attribut, darüber lassen sie sich finden.
+- Detailseite: `"<Wert> <Kategorie>, <Ergänzung>"`. Im CSV-Export steht vor Telefonnummern ein `'` (Schutz vor Formel-Injection).

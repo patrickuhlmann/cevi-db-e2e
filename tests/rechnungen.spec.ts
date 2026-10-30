@@ -17,15 +17,18 @@ async function stopImpersonation(page: any) {
   await page.context().storageState({ path: AUTH_FILE });
 }
 
-async function createInvoice(page: any, screenshotPrefix: string): Promise<string> {
+async function createInvoice(page: any, screenshotPrefix: string, withStreet = true): Promise<string> {
   await page.goto(`/groups/${GROUP_ID}/invoices/new`);
   await page.getByLabel('Titel').fill('E2E Test-Rechnung');
   // Empfängername ist seit Hitobito-Update auf Vor-/Nachname aufgeteilt
   // (recipient_name existiert nicht mehr).
   await page.locator('input[name="invoice[recipient_first_name]"]').fill('E2E');
   await page.locator('input[name="invoice[recipient_last_name]"]').fill('Test-Empfänger');
-  await page.locator('input[name="invoice[recipient_street]"]').fill('Teststrasse');
-  await page.locator('input[name="invoice[recipient_housenumber]"]').fill('1');
+  // Seit hitobito_sww#349 sind Strasse und Postfach optional
+  if (withStreet) {
+    await page.locator('input[name="invoice[recipient_street]"]').fill('Teststrasse');
+    await page.locator('input[name="invoice[recipient_housenumber]"]').fill('1');
+  }
   await page.locator('input[name="invoice[recipient_zip_code]"]').fill('8000');
   await page.locator('input[name="invoice[recipient_town]"]').fill('Zürich');
   // Land ist jetzt ein Tom-Select-Widget; das echte <select> ist visuell
@@ -44,9 +47,15 @@ async function createInvoice(page: any, screenshotPrefix: string): Promise<strin
 }
 
 async function stornierenAndCleanup(page: any, screenshotPrefix: string) {
+  const invoiceUrl = page.url();
   page.once('dialog', (dialog: any) => dialog.accept());
   await page.getByRole('link', { name: 'Stornieren' }).click();
   await expect(page.locator('#flash .alert-success')).toContainText(/storniert/);
+  // Seit Release 2026-11 bleibt man nach dem Stornieren auf der Rechnung (vorher
+  // Rechnungsliste), Stornieren und Versand/Mahnen sind dort ausgeblendet.
+  await expect(page).toHaveURL(invoiceUrl);
+  await expect(page.getByRole('link', { name: 'Stornieren' })).toHaveCount(0);
+  await expect(page.locator('.dropdown-toggle', { hasText: 'Rechnung stellen / mahnen' })).toHaveCount(0);
   // <main> ist auf Rechnungsseiten leer, darum gegen body prüfen
   await expect(page.locator('body')).toContainText('Storniert');
   await page.screenshot({ path: `screenshots/${screenshotPrefix}_storniert.png` });
@@ -90,6 +99,20 @@ test.describe('Rechnungen', () => {
     await createInvoice(page, 'rechnungen_erstellen');
 
     await stornierenAndCleanup(page, 'rechnungen_erstellen');
+    await stopImpersonation(page);
+  });
+
+  test('Rechnung ohne Strasse erstellen (als E2E Finanzen)', async ({ page }) => {
+    await impersonateFinanzen(page);
+    await cancelTestInvoices(page);
+
+    await createInvoice(page, 'rechnungen_ohne_strasse', false);
+    await expect(page.locator('body')).toContainText('8000 Zürich');
+    // vor dem Stornieren sind Stornieren und Versand/Mahnen vorhanden
+    await expect(page.getByRole('link', { name: 'Stornieren' })).toBeVisible();
+    await expect(page.locator('.dropdown-toggle', { hasText: 'Rechnung stellen / mahnen' })).toBeVisible();
+
+    await stornierenAndCleanup(page, 'rechnungen_ohne_strasse');
     await stopImpersonation(page);
   });
 

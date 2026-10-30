@@ -59,7 +59,7 @@ Permanente, manuell angelegte Events (im Gegensatz zu den UI-Tests, die ihre Eve
 | `ortsgruppe-aufbau.spec.ts` | Ortsgruppe mit Untergruppen erstellen und löschen (als Admin) |
 | `gruppe-loeschen.spec.ts` | Schutz beim Gruppe-Löschen: Button erst nach Eingabe des Gruppennamens aktiv, falscher Name/Enter/Abbrechen löscht nicht (als Admin, Testgruppe unter E2E Mio) |
 | `abos.spec.ts` | Mailing-List erstellen/löschen, An-/Abmeldung (als E2E AL) |
-| `rechnungen.spec.ts` | Rechnungen erstellen, drucken, per Mail versenden, direkt auf Person erstellen, Zahlung erfassen, stornieren (als E2E Finanzen) |
+| `rechnungen.spec.ts` | Rechnungen erstellen (auch ohne Strasse), drucken, per Mail versenden, direkt auf Person erstellen, Zahlung erfassen, stornieren: danach bleibt man auf der Rechnung, Stornieren und Versand/Mahnen sind ausgeblendet (als E2E Finanzen) |
 | `quick-search.spec.ts` | Schnellsuche nach Personen über Name und ID (Personennummer); E2E Kind ist für den Admin nicht auffindbar, für E2E AL (imitiert) schon |
 | `bestandesmeldung.spec.ts` | Bestandesmeldung validieren |
 | `bestandesmeldung-bearbeiten.spec.ts` | Mitgliederzahlen der aktuellen Bestandesmeldung bei E2E Jungschar erfassen (Jahrgänge 2015/2016), ändern, ungültiger Wert wird nicht gespeichert, alle Zahlen wieder löschen (als Admin) |

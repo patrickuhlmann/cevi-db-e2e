@@ -63,6 +63,7 @@ Permanente, manuell angelegte Events (im Gegensatz zu den UI-Tests, die ihre Eve
 | `kurs-anmeldung.spec.ts` | Person (E2E Leiter) für Kurs anmelden und abmelden (als E2E Mio Admin) |
 | `kurs-duplizieren.spec.ts` | Bestehenden Kurs (E2E API Kurs) duplizieren und Duplikat löschen (als E2E Mio Admin) |
 | `eventvorlagen.spec.ts` | Eventvorlagen: Anlass-Vorlage erstellen und Anlass daraus erstellen, E2E API Anlass als Vorlage speichern (als E2E AL); E2E API Kurs als Vorlage speichern und Kurs daraus erstellen; vererbte Vorlage aus E2E Mio in E2E Jungschar verfügbar (als E2E Mio Admin / E2E AL) |
+| `antwort-sichtbarkeit.spec.ts` | Sichtbarkeit von Antworten: Anlass mit einer für die Leitung freigegebenen und einer nicht freigegebenen Frage (als E2E AL), E2E Mami als Teilnehmerin; E2E Leiter sieht als Leitung nur die freigegebene Antwort, mit zusätzlicher Rolle Hauptleitung alle |
 | `zusaetzliche-adressen.spec.ts` | Zusätzliche Adresse bei Person (E2E AL) und Gruppe (E2E Jungschar) erfassen, Anzeige prüfen und wieder entfernen (als Admin) |
 | `kanton.spec.ts` | Kanton bei E2E AL: Feld nur bei Land Schweiz, speichern/anzeigen, bei Ausland geleert; kein Kanton bei zusätzlichen Adressen (als Admin) |
 | `personennummer.spec.ts` | Personennummer von E2E AL auf der Detailseite und als erste Spalte im CSV-Export "Alle Angaben" (als Admin) |

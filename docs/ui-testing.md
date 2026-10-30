@@ -317,3 +317,11 @@ Ablauf: `/groups/:id/csv_imports/new` → Datei per `setInputFiles` (Buffer, Tre
   ```
   Führt auf `…/events/new?source_id=<vorlage>`. Alle Angaben ausser den Daten sind übernommen, die Fragen inkl. Disclosure ebenfalls. Nur das Startdatum muss neu gesetzt werden. **Achtung:** Bleiben Vorlagen in E2E Jungschar/E2E Mio liegen, kann `getByRole('link', { name: /Anlass erstellen/ })` in `anlass.spec.ts` mehrdeutig werden. Darum räumen alle Vorlagen-Tests am Anfang und am Ende auf.
 - Nach dem Speichern über `waitForURL`/`toHaveURL` auf die Zielseite warten. `waitForLoadState()` direkt nach dem Klick liefert oft noch die alte URL.
+
+## Anmeldefragen: Sichtbarkeit der Antworten ("Einsehbar für")
+
+- Jede Frage im Tab "Anmeldungsangaben" (`#application_questions`) bzw. "Administrationsangaben" hat Checkboxen `input[name$="[visible_role_types][]"]` mit dem Rollentyp als `value` (`Event::Role::AssistantLeader` = Leitung, `Cook`, `Helper`, `Treasurer`, `Speaker`, `Participant`). Die Hauptleitung (`Event::Role::Leader`, einzige Cevi-Rolle mit `participations_full`) fehlt, sie sieht immer alles. Das Label "Einsehbar für" hat ein `for` mit Leerzeichen und passt zu keinem Feld, darum nicht über `getByLabel` gehen.
+- Eigene Frage hinzufügen: Link "Eintrag hinzufügen" im Tab. Die neue Frage ist der letzte `#application_questions_fields > .fields`-Block, Fragetext in `textarea[name$="[question]"]`. Im Bearbeiten-Formular eine bestehende Frage über `.fields` mit `has: textarea` und `hasText` finden.
+- Antworten erfassen: Teilnahme bearbeiten (`…/participations/:id/edit`), Freitext-Antworten über `getByLabel('<Fragetext>')`.
+- Zweite Rolle für eine Person, die schon teilnimmt (`roles/new?event_role[person_id]=…`): Die Rolle wird zur bestehenden Teilnahme hinzugefügt, die Weiterleitung geht dann auf die **Teilnehmerliste**, nicht auf die Teilnahme.
+- Imitieren über `/people/:id` (leitet auf die Hauptgruppe weiter), dann muss die Gruppe der Person nicht bekannt sein. E2E Mami kann der Admin wie E2E Kind nicht sehen und darum nicht imitieren.

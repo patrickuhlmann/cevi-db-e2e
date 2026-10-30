@@ -79,7 +79,7 @@ test.describe('Bestandesmeldung bearbeiten', () => {
     // Ungültiger Wert: nichts wird gespeichert. Die Fehlermeldung ("Nicht alle Jahrgänge
     // konnten gespeichert werden …") erscheint nicht: Der Server rendert das Formular mit
     // Status 200 statt 422, Turbo verwirft die Antwort ("Form responses must redirect to
-    // another location") und das Formular bleibt unverändert stehen (Bug).
+    // another location") und das Formular bleibt unverändert stehen (hitobito/hitobito#4612).
     await rowA.locator('input[name$="[person_f]"]').fill('-1');
     const [response] = await Promise.all([
       page.waitForResponse((r) => r.request().method() === 'POST'),

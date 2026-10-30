@@ -6,8 +6,8 @@ import { test, expect, Page } from '@playwright/test';
 // Prüfung passiert auf dem Server.
 //
 // Nicht getestet: Ändern der Haupt-E-Mail einer bestehenden Person. Dort wird eine
-// ungültige Adresse gespeichert, solange die bisherige gültig war (Bug, siehe
-// CHANGELOG). Ein Test würde die Login-Adresse von Testpersonen verändern.
+// ungültige Adresse gespeichert, solange die bisherige gültig war
+// (hitobito/hitobito#4613). Ein Test würde die Login-Adresse von Testpersonen verändern.
 
 const GROUP_ID = 585; // E2E Team
 const E2E_LEITER_PERSON_ID = 3550;

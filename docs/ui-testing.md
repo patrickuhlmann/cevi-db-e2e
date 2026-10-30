@@ -387,7 +387,7 @@ Als Kontaktperson ohne E-Mail eignet sich E2E Mami (3553), sie ist für E2E AL s
 - Bearbeiten (`/groups/:id/member_counts/edit`) und Löschen dürfen nur Personen mit `layer_and_below_full` auf einer **übergeordneten** Ebene (`in_upper_layer_hierarchy`), also z.B. der Admin, nicht E2E AL. Das Jahr steht im versteckten `input#year`.
 - Formular: Tabelle `#current_member_counts_fields`, eine `tr.fields` pro Jahrgang, Felder `input[name$="[born_in]"]` (nur bei neuen Zeilen), `[person_f]`, `[person_m]`. Neue Zeile über "Eintrag hinzufügen". Der Submit-Button heisst "Gruppe aktualisieren", nicht "Speichern".
 - Anzeige: Zeile pro Jahrgang mit den Zellen Jahrgang, w, m, Total und einer leeren Aktionszelle; 0 erscheint als "-". "Löschen" entfernt alle Zahlen des Jahres (Flash "Die Mitgliederzahlen für <Jahr> wurden erfolgreich gelöscht.").
-- Bei einem ungültigen Wert antwortet der Server mit 200 statt 422. Turbo verwirft die Antwort, es erscheint **keine** Fehlermeldung. Im Test auf die POST-Antwort warten und danach prüfen, dass nichts gespeichert wurde.
+- Bei einem ungültigen Wert antwortet der Server mit 200 statt 422. Turbo verwirft die Antwort, es erscheint **keine** Fehlermeldung (hitobito/hitobito#4612). Im Test auf die POST-Antwort warten und danach prüfen, dass nichts gespeichert wurde.
 
 ## Telefonnummern und weitere E-Mails (Kategorien)
 
@@ -404,7 +404,7 @@ Als Kontaktperson ohne E-Mail eignet sich E2E Mami (3553), sie ist für E2E AL s
 
 ## E-Mail-Validierung: Haupt-E-Mail bestehender Personen nicht mit ungültigen Werten testen
 
-Eine ungültige Haupt-E-Mail wird bei einer bestehenden Person **gespeichert**, solange die alte gültig war (siehe CHANGELOG, Bug in `Person#valid_email?`). Ein Test damit verändert die Login-Adresse der Testperson. Die Validierung darum über weitere E-Mails oder über eine neue Person (`/groups/:id/roles/new` → "Neue Person erfassen", `#role_new_person_email`) prüfen. Dort ist nach einem Fehler nichts angelegt. Das Feld `type="email"` lässt `a..b@x.ch` und `a.@x.ch` im Browser durch.
+Eine ungültige Haupt-E-Mail wird bei einer bestehenden Person **gespeichert**, solange die alte gültig war (hitobito/hitobito#4613, Bug in `Person#valid_email?`). Ein Test damit verändert die Login-Adresse der Testperson. Die Validierung darum über weitere E-Mails oder über eine neue Person (`/groups/:id/roles/new` → "Neue Person erfassen", `#role_new_person_email`) prüfen. Dort ist nach einem Fehler nichts angelegt. Das Feld `type="email"` lässt `a..b@x.ch` und `a.@x.ch` im Browser durch.
 
 ## Gruppenadresse (Tab "Kontaktangaben")
 

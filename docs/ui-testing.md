@@ -380,3 +380,11 @@ Als Kontaktperson ohne E-Mail eignet sich E2E Mami (3553), sie ist für E2E AL s
 - "Verwalter*in zuweisen" steckt im Dropdown "Erstellen" neben der Überschrift "Kinder / Verwalter*innen" und öffnet **inline** den Abschnitt "Verwalter*innen" mit einem Feld "Person suchen..." (keine neue Seite).
 - Ceviname (`#person_nickname`) erscheint im Titel als "Vorname Nachname / Ceviname". Gut geeignet für harmlose Änderungen, die man danach wieder leert.
 - Neue Person über `/groups/:id/roles/new` anlegen: Link "Neue Person erfassen", Felder `#role_new_person_first_name`/`_last_name`, und die Checkbox `#role_new_person_privacy_policy_accepted` (Datenschutz) ist Pflicht (Browser-Validierung, ohne sie passiert beim Speichern nichts).
+
+## Bestandesmeldung: Mitgliederzahlen bearbeiten
+
+- Reiter "Bestand" einer Gruppe: `/groups/:id/census/group` (bei der Mitgliederorganisation `/census/mitgliederorganisation`). Ohne `?year=` zeigt er die aktuelle Bestandesmeldung (auf INTEGRATION zuletzt 2029). Das "!" im Reiter heisst: noch keine Zahlen für das aktuelle Jahr.
+- Bearbeiten (`/groups/:id/member_counts/edit`) und Löschen dürfen nur Personen mit `layer_and_below_full` auf einer **übergeordneten** Ebene (`in_upper_layer_hierarchy`), also z.B. der Admin, nicht E2E AL. Das Jahr steht im versteckten `input#year`.
+- Formular: Tabelle `#current_member_counts_fields`, eine `tr.fields` pro Jahrgang, Felder `input[name$="[born_in]"]` (nur bei neuen Zeilen), `[person_f]`, `[person_m]`. Neue Zeile über "Eintrag hinzufügen". Der Submit-Button heisst "Gruppe aktualisieren", nicht "Speichern".
+- Anzeige: Zeile pro Jahrgang mit den Zellen Jahrgang, w, m, Total und einer leeren Aktionszelle; 0 erscheint als "-". "Löschen" entfernt alle Zahlen des Jahres (Flash "Die Mitgliederzahlen für <Jahr> wurden erfolgreich gelöscht.").
+- Bei einem ungültigen Wert antwortet der Server mit 200 statt 422. Turbo verwirft die Antwort, es erscheint **keine** Fehlermeldung. Im Test auf die POST-Antwort warten und danach prüfen, dass nichts gespeichert wurde.

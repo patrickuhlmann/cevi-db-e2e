@@ -62,6 +62,7 @@ Permanente, manuell angelegte Events (im Gegensatz zu den UI-Tests, die ihre Eve
 | `rechnungen.spec.ts` | Rechnungen erstellen, drucken, per Mail versenden, direkt auf Person erstellen, Zahlung erfassen, stornieren (als E2E Finanzen) |
 | `quick-search.spec.ts` | Schnellsuche nach Personen über Name und ID (Personennummer); E2E Kind ist für den Admin nicht auffindbar, für E2E AL (imitiert) schon |
 | `bestandesmeldung.spec.ts` | Bestandesmeldung validieren |
+| `bestandesmeldung-bearbeiten.spec.ts` | Mitgliederzahlen der aktuellen Bestandesmeldung bei E2E Jungschar erfassen (Jahrgänge 2015/2016), ändern, ungültiger Wert wird nicht gespeichert, alle Zahlen wieder löschen (als Admin) |
 | `spenderschutz.spec.ts` | Spender-Sichtbarkeitsschutz prüfen |
 | `anlass.spec.ts` | Anlass erstellen und löschen (als E2E AL in E2E Jungschar) |
 | `anlass-anmeldung.spec.ts` | Person (E2E Leiter) für Anlass anmelden und abmelden (als E2E AL) |

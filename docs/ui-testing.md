@@ -253,6 +253,6 @@ await fields.locator('input[name$="[street]"]').fill('Bahnhofstrasse');
 ```
 - **Land ist Pflicht** ("Land muss ausgefüllt werden") und ein Tom-Select-Widget (wie bei Rechnungen): ID des versteckten `<select name$="[country]">` auslesen, dann `#<id>-ts-control` klicken und `#<id>-ts-dropdown [data-value="CH"]` wählen.
 - **"Namen der Person/Gruppe übernehmen"** (`[uses_contactable_name]`) ist standardmässig aktiv; die Namensfelder sind dann ausgeblendet und werden erst nach `uncheck()` sichtbar.
-- **"Bezeichnung" (`[label]`) wird beim Speichern verworfen** (Strong-Params-Fehler in hitobito, siehe CHANGELOG). Testeinträge darum nicht über die Bezeichnung, sondern z.B. über die Strasse identifizieren.
+- **"Bezeichnung" (`[label]`) wird beim Speichern verworfen** (Strong-Params-Fehler in hitobito, hitobito/hitobito#4609). Testeinträge darum nicht über die Bezeichnung, sondern z.B. über die Strasse identifizieren.
 - Entfernen: in der Zeile (`.labeled.controls`) den Link `.remove_nested_fields` klicken und speichern.
 - Anzeige: im ersten `<address>` als `"<Name>, <Strasse Nr>, <PLZ Ort>"`, gefolgt von der Kategorie (nur Kategorie, keine Bezeichnung) – direkt nach der Hauptadresse und vor den E-Mail-Adressen.

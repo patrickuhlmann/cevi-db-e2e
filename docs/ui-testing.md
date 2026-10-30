@@ -373,3 +373,10 @@ Als Kontaktperson ohne E-Mail eignet sich E2E Mami (3553), sie ist für E2E AL s
 - Formular: `#help_text_context` (Werte wie `people--person`). Pro Kontext gibt es ein eigenes `select#help_text_key`, alle ausser dem aktiven sind `disabled`, darum `select#help_text_key:not([disabled])` mit Werten wie `field.title` oder `action.show`. Inhalt ist ein Trix-Editor, `locator('trix-editor#help_text_body').fill(…)` funktioniert. Checkbox `#help_text_start_open` ("Text initial Anzeigen").
 - Liste: Löschen über `a[data-method="delete"]` mit nativem `confirm()`, Bearbeiten über `a[href$="/edit"]`.
 - Darstellung im Formular: Info-Icon `.help-text-trigger[data-key="help_text_<id>"]` und der Text `.help-text.help_text_<id>`. Versteckte Texte haben `data-initially-closed`, ein Klick auf das Icon blendet sie ein.
+
+## Personen bearbeiten: Bearbeiten-Links, Rollen, Verwalter
+
+- Auf der Personenseite gibt es mehrere Links "Bearbeiten" (Person und jede Rolle als Icon mit `title`). Für die Person `a[href="/groups/:gid/people/:id/edit"]` verwenden, für eine Rolle `a[href^="/groups/:gid/roles/"][href$="/edit"]`. Im Rollenformular ist die Bezeichnung `#role_label`, sie erscheint auf der Personenseite in Klammern hinter dem Rollennamen.
+- "Verwalter*in zuweisen" steckt im Dropdown "Erstellen" neben der Überschrift "Kinder / Verwalter*innen" und öffnet **inline** den Abschnitt "Verwalter*innen" mit einem Feld "Person suchen..." (keine neue Seite).
+- Ceviname (`#person_nickname`) erscheint im Titel als "Vorname Nachname / Ceviname". Gut geeignet für harmlose Änderungen, die man danach wieder leert.
+- Neue Person über `/groups/:id/roles/new` anlegen: Link "Neue Person erfassen", Felder `#role_new_person_first_name`/`_last_name`, und die Checkbox `#role_new_person_privacy_policy_accepted` (Datenschutz) ist Pflicht (Browser-Validierung, ohne sie passiert beim Speichern nichts).

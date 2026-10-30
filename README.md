@@ -22,7 +22,7 @@ Alle Tests basieren auf einer fixen Teststruktur auf dem Integrationssystem:
 |---|---|---|
 | E2E Mio (ID: 582) | Mitgliederorganisation | Dachgruppe |
 | └ E2E Geschäftsstelle (ID: 619) | MitgliederorganisationGeschaeftsstelle | Person: E2E GS Mitarbeiter (ID: 3558) |
-| └ E2E Ortsgruppe | Ortsgruppe | |
+| └ E2E Ortsgruppe (ID: 583) | Ortsgruppe | Person: E2E OG Admin (ID: 3715, Rolle Administrator/-in Cevi DB) |
 | &nbsp;&nbsp;└ E2E Jungschar (ID: 584) | Jungschar | |
 | &nbsp;&nbsp;&nbsp;&nbsp;├ E2E Eltern (ID: 587) | Untergruppe | Person: E2E Mami (ID: 3553, keine E-Mail-Adresse, Adresse Teststrasse 2, 8000 Zürich, CH) |
 | &nbsp;&nbsp;&nbsp;&nbsp;├ E2E Fröschli (ID: 586) | Untergruppe | Person: E2E Kind (ID: 3554) |
@@ -32,6 +32,8 @@ Alle Tests basieren auf einer fixen Teststruktur auf dem Integrationssystem:
 **E2E Admin** (e2e-cevidb@cevimail.ch): Administrator auf Ebene Cevi Schweiz (Dachverband).
 
 **E2E Kind** (ID: 3554): Kind in E2E Fröschli. Für E2E Admin (Dachverband) nicht sichtbar, für E2E AL (Jungschar) schon. Wird in `quick-search.spec.ts` für die Suche nach Name und ID verwendet.
+
+**E2E OG Admin** (ID: 3715): Administrator/-in Cevi DB in E2E Ortsgruppe (Gruppe 583), ohne E-Mail-Adresse. Die Rolle hat `layer_and_below_full` und `see_invisible_from_above`, die Person sieht darum E2E Kind. Wird in `unsichtbar-von-oben.spec.ts` imitiert.
 
 **E2E Mio Admin** (ID: 3557): Administrator/-in in E2E Mio (Gruppe 582). Wird für Kurs-Tests imitiert. Hat keine E-Mail-Adresse und kann darum nicht Kontaktperson von Anlässen/Kursen sein.
 
@@ -77,6 +79,7 @@ Permanente, manuell angelegte Events (im Gegensatz zu den UI-Tests, die ihre Eve
 | `zusaetzliche-adressen.spec.ts` | Zusätzliche Adresse bei Person (E2E AL) und Gruppe (E2E Jungschar) erfassen, Anzeige prüfen und wieder entfernen (als Admin) |
 | `kanton.spec.ts` | Kanton bei E2E AL: Feld nur bei Land Schweiz, speichern/anzeigen, bei Ausland geleert; kein Kanton bei zusätzlichen Adressen (als Admin) |
 | `personennummer.spec.ts` | Personennummer von E2E AL auf der Detailseite und als erste Spalte im CSV-Export "Alle Angaben" (als Admin) |
+| `unsichtbar-von-oben.spec.ts` | E2E OG Admin (Administrator/-in Cevi DB in E2E Ortsgruppe, imitiert) sieht E2E Kind, das für den Admin unsichtbar ist, bearbeitet Ceviname und Rollen-Bezeichnung und kann Verwalter*innen zuweisen; Änderungen werden zurückgesetzt |
 | `csv-import.spec.ts` | CSV-Import in E2E Team mit Personennummer: E2E Leiter über die ID aktualisieren, neue Person mit vorgegebener ID erstellen und löschen, Abbruch bei doppelter ID (als Admin); keine ID-Zuordnung ohne Admin-Recht (als E2E AL) |
 
 ## API-Tests

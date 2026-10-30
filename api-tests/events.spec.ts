@@ -26,3 +26,20 @@ test('Kurs-Details via API abrufen', async ({ request }) => {
   expect(body.data.attributes.name).toBe('E2E API Kurs');
   expect(body.data.attributes.type).toBe('Event::Course');
 });
+
+// Seit hitobito_sww#376 lassen sich die Angaben der Kontaktperson mit
+// include=contact_details laden. Enthalten sind nur die Angaben, die im Anlass unter
+// den Anzeigeoptionen der Kontaktperson angewählt sind (bei E2E API Anlass alle).
+test('Kontaktperson eines Anlasses mit include=contact_details abrufen', async ({ request }) => {
+  const response = await request.get(`/api/events/${ANLASS_ID}?include=contact_details`);
+  expect(response.status()).toBe(200);
+
+  const body = await response.json();
+  expect(body.data.relationships.contact_details.data).toEqual({ type: 'event-contact-details', id: String(ANLASS_ID) });
+  const contactDetails = body.included.find((entry: any) => entry.type === 'event-contact-details');
+  expect(contactDetails.attributes).toMatchObject({
+    first_name: 'E2E',
+    last_name: 'AL',
+    email: 'e2e-al@uhlme.ch',
+  });
+});

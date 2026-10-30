@@ -49,7 +49,7 @@ Permanente, manuell angelegte Events (im Gegensatz zu den UI-Tests, die ihre Eve
 
 | Fixture | Event-ID | Gruppe | Teilnehmer |
 |---|---|---|---|
-| E2E API Anlass | 1458 | E2E Jungschar (584) | E2E AL (3552) |
+| E2E API Anlass | 1458 | E2E Jungschar (584) | E2E AL (3552), zugleich Kontaktperson (alle Anzeigeoptionen an, für `include=contact_details`) |
 | E2E API Kurs | 1459 | E2E Mio (582) | Person 3550 |
 
 ## Tests
@@ -96,8 +96,9 @@ Permanente, manuell angelegte Events (im Gegensatz zu den UI-Tests, die ihre Eve
 |---|---|
 | `groups.spec.ts` | Gruppendetails abrufen (E2E Mio) |
 | `people.spec.ts` | Persondetails abrufen (E2E AL) |
-| `events.spec.ts` | Anlass- und Kurs-Details abrufen |
+| `events.spec.ts` | Anlass- und Kurs-Details abrufen, Kontaktperson des Anlasses mit `include=contact_details` |
 | `participations.spec.ts` | Teilnehmer eines Anlasses und eines Kurses abrufen |
+| `types.spec.ts` | Gruppen- und Rollentypen ohne Token abrufen (inkl. Untergruppen bzw. Gruppentypen), andere Endpoints ohne Token 401 |
 | `errors.spec.ts` | Fehlerfälle: falsches Token (401), nicht existierende ID (404) |
 
 Benötigt einen Service Token (`HITOBITO_API_TOKEN`), erstellt in hitobito auf Layer **E2E Mio (582)** mit Permission **`layer_and_below_read`** und Scopes **`groups`, `people`, `events`, `event_participations`**. Details siehe `docs/api-testing.md`.

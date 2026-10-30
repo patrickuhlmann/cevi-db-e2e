@@ -74,9 +74,23 @@ Im Gegensatz zu den UI-Tests (die ihre Anlässe/Kurse selbst erstellen und lösc
 
 | Fixture | ID | Gruppe | Teilnehmer |
 |---|---|---|---|
-| E2E API Anlass | 1458 | E2E Jungschar (584) | E2E AL (3552), aktiv |
+| E2E API Anlass | 1458 | E2E Jungschar (584) | E2E AL (3552), aktiv; E2E AL ist auch Kontaktperson |
 | E2E API Kurs | 1459 | E2E Mio (582) | Person 3550, aktiv |
 
 ## Format-Konstante
 
 Route-Scope erzwingt `format: "jsonapi"` als Default (`ApplicationResource.endpoint_namespace = "/api/"`), d.h. `GET /api/groups/582` funktioniert ohne Extension. `Accept: application/vnd.api+json` trotzdem immer mitschicken (JSON:API-Konvention, macht Intent explizit).
+
+## Endpoints ohne Authentisierung: Gruppen- und Rollentypen
+
+`GET /api/group_types` und `GET /api/role_types` (seit hitobito/hitobito#4488) brauchen kein Token. Weil die Konfiguration `X-Token` für alle Requests setzt, für "ohne Token" einen eigenen Kontext erstellen:
+
+```typescript
+const anonymous = await playwrightRequest.newContext({ baseURL, extraHTTPHeaders: { Accept: 'application/vnd.api+json' } });
+```
+
+Die IDs sind die STI-Namen (`Group::Ortsgruppe`, `Group::Ortsgruppe::AdministratorCeviDB`). Sideloads: `include=possible_children`/`role_types` bei Gruppentypen, `include=group_types` bei Rollentypen. Keine Paginierung nötig, alle Typen kommen auf einmal (Cevi: 169 Rollentypen).
+
+## Kontaktperson eines Anlasses: `include=contact_details`
+
+`GET /api/events/:id?include=contact_details` lädt eine eigene Ressource vom Typ `event-contact-details` (ID = Anlass-ID) mit den Angaben der Kontaktperson. Enthalten sind nur Attribute, deren Anzeigeoption im Anlass angewählt ist ("Name anzeigen" → `first_name`/`last_name`/`nickname`, "E-Mail anzeigen" → `email`/`additional_emails` …), Telefonnummern und weitere Kontaktangaben nur, wenn öffentlich. Ohne Kontaktperson ist `relationships.contact_details.data` `null`.

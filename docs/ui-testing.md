@@ -337,3 +337,11 @@ await Promise.all([
 await page.waitForLoadState('networkidle');
 ```
 Als Kontaktperson ohne E-Mail eignet sich E2E Mami (3553), sie ist für E2E AL sichtbar. E2E Mio Admin hat zwar auch keine E-Mail, darf von E2E AL aber nicht gesehen werden ("Kontaktperson Zugriff verweigert").
+
+## Kurs-Qualifikationen erfassen (`/groups/:id/events/:id/qualifications`)
+
+- Die Seite gibt es nur bei einer **qualifizierenden Kursart** (sonst 404). Die erste Kursart im Select (Seilbahnauffrischung, auch die Kursart von E2E API Kurs) vergibt im Kurs keine Qualifikation. Darum Kursart 8 "MIRA BK" verwenden (`#event_kind_id` → `selectOption('8')`), sie vergibt "MIRA Basiskurs".
+- Auf der Seite erscheinen nur **aktive** Teilnahmen. Eine Anmeldung über `roles/new` ist bei Kursen "applied" und muss zuerst im Anmeldungs-Markt zugeteilt werden: `/application_market` → in `#applications` die Zeile der Person → Pfeil-Link `a:has(.fa-arrow-left)` → im Modal `#email-confirmation-modal` den Link "Bestätigen ohne E-Mail". Danach steht die Person in `#participants`.
+- Pro Person (Zeile, z.B. `filter({ hasText: 'Leiter E2E' })`) Radios mit `aria-label` "Bestanden", "Nicht bestanden", "Nicht beurteilt" und ein Textfeld "Kommentar". Wichtig: `getByRole('radio', { name: 'Bestanden', exact: true })`, sonst passt auch "Nicht bestanden". Speichern mit "Qualifikationen aktualisieren", Flash "Die Qualifikationen wurden erfolgreich aktualisiert."
+- **Sichtbarkeit im Verlauf** (`/groups/:gid/people/:id/history`): hitobito_youth zeigt Qualifikation und Kommentar erst, wenn der Kurs-Status "Qualifikationen erfasst" (`completed`) oder "Abgeschlossen" (`closed`) ist. Status über das Kursformular `#event_state` setzen. `closed` meiden: Der Wechsel darauf setzt alle Teilnahmen auf "attended". Die Zeile der Teilnahme ist `tr[id^="event_participation_"]` (auf derselben Seite gibt es auch die Tabelle "Qualifikationen" mit dem Kursnamen als Ursprung), der Kommentar steckt im `title` des Info-Icons.
+- Aufräumen: Status zurück auf `created`, Qualifikation auf "Nicht beurteilt" setzen (entfernt die vergebene Qualifikation bei der Person), dann den Kurs löschen.

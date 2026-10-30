@@ -277,3 +277,14 @@ await page.locator(`.ts-control:has(#${selectId}-ts-control)`).click();
 await page.locator(`#${selectId}-ts-dropdown [data-value="DE"]`).first().click();
 ```
 Auswahl leeren (löst das `change`-Event aus wie eine Benutzereingabe): `await page.locator('#person_country').evaluate((el: any) => el.tomselect.clear());`
+
+## Personen-Export (Einzelperson): synchroner Download
+
+Auf der Personen-Detailseite hat das Export-Menü `#dropdown_people_export` verschachtelte Untermenüs (CSV / Excel / Etiketten …). Das Untermenü öffnet sich per Hover. Der Export einer **einzelnen** Person ist synchron (`…/people/:id.csv?details=true`) und löst direkt ein `download`-Event aus. Der Export der ganzen Personenliste läuft dagegen als Hintergrund-Job. CSV-Trennzeichen ist `;`, ein allfälliges BOM vor dem Parsen entfernen:
+```typescript
+await page.locator('#dropdown_people_export > .dropdown-toggle').click();
+await page.locator('#dropdown_people_export').getByRole('link', { name: 'CSV', exact: true }).hover();
+const downloadPromise = page.waitForEvent('download');
+await page.locator('#dropdown_people_export').getByRole('link', { name: 'Alle Angaben' }).first().click();
+const csv = fs.readFileSync(await (await downloadPromise).path(), 'utf-8').replace(/^\uFEFF/, '');
+```

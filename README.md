@@ -25,11 +25,13 @@ Alle Tests basieren auf einer fixen Teststruktur auf dem Integrationssystem:
 | └ E2E Ortsgruppe | Ortsgruppe | |
 | &nbsp;&nbsp;└ E2E Jungschar (ID: 584) | Jungschar | |
 | &nbsp;&nbsp;&nbsp;&nbsp;├ E2E Eltern | Untergruppe | Person: E2E Mami |
-| &nbsp;&nbsp;&nbsp;&nbsp;├ E2E Fröschli | Untergruppe | Person: E2E Kind |
+| &nbsp;&nbsp;&nbsp;&nbsp;├ E2E Fröschli (ID: 586) | Untergruppe | Person: E2E Kind (ID: 3554) |
 | &nbsp;&nbsp;&nbsp;&nbsp;├ E2E Spender (ID: 588) | Untergruppe | 1 Spender (versteckt) |
 | &nbsp;&nbsp;&nbsp;&nbsp;└ E2E Team | Untergruppe | Person: E2E Leiter, E2E AL (ID: 3552) |
 
 **E2E Admin** (e2e-cevidb@cevimail.ch): Administrator auf Ebene Cevi Schweiz (Dachverband).
+
+**E2E Kind** (ID: 3554): Kind in E2E Fröschli. Für E2E Admin (Dachverband) nicht sichtbar, für E2E AL (Jungschar) schon. Wird in `quick-search.spec.ts` für die Suche nach Name und ID verwendet.
 
 **E2E Mio Admin** (ID: 3557): Administrator/-in in E2E Mio (Gruppe 582). Wird für Kurs-Tests imitiert. Hat keine E-Mail-Adresse und kann darum nicht Kontaktperson von Anlässen/Kursen sein.
 
@@ -51,7 +53,7 @@ Permanente, manuell angelegte Events (im Gegensatz zu den UI-Tests, die ihre Eve
 | `ortsgruppe-aufbau.spec.ts` | Ortsgruppe mit Untergruppen erstellen und löschen (als Admin) |
 | `abos.spec.ts` | Mailing-List erstellen/löschen, An-/Abmeldung (als E2E AL) |
 | `rechnungen.spec.ts` | Rechnungen erstellen, drucken, per Mail versenden, direkt auf Person erstellen, Zahlung erfassen, stornieren (als E2E Finanzen) |
-| `quick-search.spec.ts` | Schnellsuche nach Personen |
+| `quick-search.spec.ts` | Schnellsuche nach Personen über Name und ID (Personennummer); E2E Kind ist für den Admin nicht auffindbar, für E2E AL (imitiert) schon |
 | `bestandesmeldung.spec.ts` | Bestandesmeldung validieren |
 | `spenderschutz.spec.ts` | Spender-Sichtbarkeitsschutz prüfen |
 | `anlass.spec.ts` | Anlass erstellen und löschen (als E2E AL in E2E Jungschar) |

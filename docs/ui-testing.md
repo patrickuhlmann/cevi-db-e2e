@@ -288,3 +288,9 @@ const downloadPromise = page.waitForEvent('download');
 await page.locator('#dropdown_people_export').getByRole('link', { name: 'Alle Angaben' }).first().click();
 const csv = fs.readFileSync(await (await downloadPromise).path(), 'utf-8').replace(/^\uFEFF/, '');
 ```
+
+## Schnellsuche (`#quicksearch`)
+
+- **Startseite `/` leitet auf die eigene Personenseite um** (`/groups/1/people/3549`). Ein `waitForURL(/\/people\/\d+/)` nach dem Absenden der Suche ist darum **sofort** erfüllt, und Negativprüfungen (`not.toContainText`) laufen ins Leere. Immer warten, bis sich die URL geändert hat (Helper `search()` in `tests/quick-search.spec.ts`). Bei genau einem Treffer leitet die Suche direkt auf die Personenseite weiter, sonst auf `/full?q=…`. Ohne Treffer zeigt `/full` "Keine Einträge gefunden".
+- **Vorschlagsliste** (autoComplete.js): erscheint beim Tippen (`pressSequentially`, nicht `fill`). Einträge sind `#quicksearch ~ [role="listbox"] [role="option"]` mit dem Namen als Text ("E2E AL", Vorname zuerst). Ein Klick auf einen Eintrag öffnet die Person.
+- **Suche über ID**: Eine Zahl findet die Person mit dieser Personennummer als ersten Treffer. Danach folgen Volltext-Treffer, die dieselbe Zahl in anderen Feldern enthalten. Bei einer ID ist darum oft mehr als ein Treffer vorhanden, und es gibt keine direkte Weiterleitung.

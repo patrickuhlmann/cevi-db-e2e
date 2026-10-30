@@ -366,3 +366,10 @@ Als Kontaktperson ohne E-Mail eignet sich E2E Mami (3553), sie ist für E2E AL s
 
 - Formular `/groups/:id/invoice_config/edit` (E2E Finanzen für E2E Jungschar), Tab `a[href="#payment_provider_configs"]`. Pro Bank ein `fieldset` mit `legend` "Zahlungsschnittstelle - <Bank> (EBICS 3.0)" bzw. "(EBICS 2.5)", Felder Teilnehmer-ID, Partner-ID und Passwort sowie das versteckte `[legacy_25_ebics]` (`false` = 3.0). Banknamen wie in hitobito, z.B. "Postfinance" (nicht "PostFinance").
 - Der Test speichert bewusst nicht: Mit ausgefüllten Zugangsdaten würde hitobito versuchen, die Schnittstelle bei der Bank einzurichten (nicht ausprobiert), und die Einstellungen sind für alle Rechnungs-Tests der Gruppe relevant.
+
+## Hilfetexte (`/help_texts`, nur Admin)
+
+- Hilfetexte sind global und gelten für alle Benutzer von INTEGRATION. Darum nur Kontext/Schlüssel ohne bestehenden Hilfetext verwenden (z.B. Person / Feld "Titel") und immer am Anfang und am Ende löschen. Bestehende Hilfetexte anderer nicht anfassen.
+- Formular: `#help_text_context` (Werte wie `people--person`). Pro Kontext gibt es ein eigenes `select#help_text_key`, alle ausser dem aktiven sind `disabled`, darum `select#help_text_key:not([disabled])` mit Werten wie `field.title` oder `action.show`. Inhalt ist ein Trix-Editor, `locator('trix-editor#help_text_body').fill(…)` funktioniert. Checkbox `#help_text_start_open` ("Text initial Anzeigen").
+- Liste: Löschen über `a[data-method="delete"]` mit nativem `confirm()`, Bearbeiten über `a[href$="/edit"]`.
+- Darstellung im Formular: Info-Icon `.help-text-trigger[data-key="help_text_<id>"]` und der Text `.help-text.help_text_<id>`. Versteckte Texte haben `data-initially-closed`, ein Klick auf das Icon blendet sie ein.

@@ -24,7 +24,7 @@ Alle Tests basieren auf einer fixen Teststruktur auf dem Integrationssystem:
 | └ E2E Geschäftsstelle (ID: 619) | MitgliederorganisationGeschaeftsstelle | Person: E2E GS Mitarbeiter (ID: 3558) |
 | └ E2E Ortsgruppe | Ortsgruppe | |
 | &nbsp;&nbsp;└ E2E Jungschar (ID: 584) | Jungschar | |
-| &nbsp;&nbsp;&nbsp;&nbsp;├ E2E Eltern (ID: 587) | Untergruppe | Person: E2E Mami (ID: 3553, keine E-Mail-Adresse) |
+| &nbsp;&nbsp;&nbsp;&nbsp;├ E2E Eltern (ID: 587) | Untergruppe | Person: E2E Mami (ID: 3553, keine E-Mail-Adresse, Adresse Teststrasse 2, 8000 Zürich, CH) |
 | &nbsp;&nbsp;&nbsp;&nbsp;├ E2E Fröschli (ID: 586) | Untergruppe | Person: E2E Kind (ID: 3554) |
 | &nbsp;&nbsp;&nbsp;&nbsp;├ E2E Spender (ID: 588) | Untergruppe | 1 Spender (versteckt) |
 | &nbsp;&nbsp;&nbsp;&nbsp;└ E2E Team (ID: 585) | Untergruppe | Person: E2E Leiter (ID: 3550, Rolle Mitarbeiter/-in), E2E AL (ID: 3552) |
@@ -36,6 +36,8 @@ Alle Tests basieren auf einer fixen Teststruktur auf dem Integrationssystem:
 **E2E Mio Admin** (ID: 3557): Administrator/-in in E2E Mio (Gruppe 582). Wird für Kurs-Tests imitiert. Hat keine E-Mail-Adresse und kann darum nicht Kontaktperson von Anlässen/Kursen sein.
 
 **E2E Finanzen** (ID: 3556): Person mit Finanz-Berechtigung (Finanzverantwortliche/-r) sowie zusätzlich Adressverwalter/-in in E2E Jungschar (Gruppe 584). Wird für Rechnungs-Tests imitiert. Die zweite Rolle (layer_and_below_full) ist nötig, damit die Person-zu-Person-Rechnungserstellung (Empfänger-Vorausfüllung) funktioniert – die reine Finanzrolle gewährt kein Personen-Update-Recht, das dafür serverseitig verlangt wird.
+
+**E2E Mami** (ID: 3553): Hat keine E-Mail-Adresse (Kontaktperson-Test), aber eine vollständige Adresse. Sie ist die einzige Testperson mit Adresse und darum Empfängerin des Rechnungslaufs in `rechnungen-herkunft.spec.ts` (Personen ohne PLZ/Ort/Land überspringt ein Rechnungslauf stillschweigend). Fehlt die Adresse, setzt der Test sie wieder.
 
 **Kursart "MIRA BK"** (ID: 8, global unter `/event_kinds`): Vergibt Teilnehmenden die Qualifikation "MIRA Basiskurs". Wird in `qualifikation-kommentar.spec.ts` verwendet, weil die Qualifikationsseite eines Kurses nur bei einer qualifizierenden Kursart existiert. Sie vergibt genau eine Qualifikation und keine Verlängerungen.
 
@@ -66,6 +68,7 @@ Permanente, manuell angelegte Events (im Gegensatz zu den UI-Tests, die ihre Eve
 | `kurs-duplizieren.spec.ts` | Bestehenden Kurs (E2E API Kurs) duplizieren und Duplikat löschen (als E2E Mio Admin) |
 | `eventvorlagen.spec.ts` | Eventvorlagen: Anlass-Vorlage erstellen und Anlass daraus erstellen, E2E API Anlass als Vorlage speichern (als E2E AL); E2E API Kurs als Vorlage speichern und Kurs daraus erstellen; vererbte Vorlage aus E2E Mio in E2E Jungschar verfügbar (als E2E Mio Admin / E2E AL) |
 | `kontaktperson.spec.ts` | Anlass ohne Kontaktperson und mit Kontaktperson ohne E-Mail (E2E Mami) wird abgelehnt, mit E2E AL gespeichert (als E2E AL) |
+| `rechnungen-herkunft.spec.ts` | Menüpunkt "Rechnungen" statt "Einzelrechnungen"; Einzelrechnung und Rechnungslauf (an E2E Mami) erscheinen gemeinsam in der Liste; Filter "Einzelrechnungen" / "aus Rechnungsläufen", gemerkt bei `returning=true`; Lauf löschen, Rechnung stornieren (als E2E Finanzen) |
 | `rechnungsposten-export.spec.ts` | Rechnung mit zwei Posten erstellen, nur diese als CSV "Rechnungsposten" exportieren, Datei aus der Jobübersicht laden: eine Zeile pro Posten mit Name/Anzahl/Preis/Total und Rechnungstitel; Rechnung stornieren (als E2E Finanzen) |
 | `qualifikation-kommentar.spec.ts` | Kurs mit Kursart MIRA BK (als E2E Mio Admin), E2E Leiter zuteilen, Qualifikation "Bestanden" mit Kommentar erfassen, Status "Qualifikationen erfasst"; E2E Leiter sieht Kommentar als Tooltip im Verlauf; Qualifikation wird beim Aufräumen zurückgenommen |
 | `antwort-sichtbarkeit.spec.ts` | Sichtbarkeit von Antworten: Anlass mit einer für die Leitung freigegebenen und einer nicht freigegebenen Frage (als E2E AL), E2E Mami als Teilnehmerin; E2E Leiter sieht als Leitung nur die freigegebene Antwort, mit zusätzlicher Rolle Hauptleitung alle |

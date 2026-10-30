@@ -47,8 +47,25 @@ async function stornierenAndCleanup(page: any, screenshotPrefix: string) {
   page.once('dialog', (dialog: any) => dialog.accept());
   await page.getByRole('link', { name: 'Stornieren' }).click();
   await expect(page.locator('#flash .alert-success')).toContainText(/storniert/);
-  await expect(page.locator('main')).not.toContainText('E2E Test-Rechnung');
+  // <main> ist auf Rechnungsseiten leer, darum gegen body prüfen
+  await expect(page.locator('body')).toContainText('Storniert');
   await page.screenshot({ path: `screenshots/${screenshotPrefix}_storniert.png` });
+}
+
+// Storniert alle Testrechnungen ("E2E Test-Rechnung", "E2E Test-Rechnung Person"),
+// auch Überbleibsel abgebrochener Läufe. Stornieren geht in jedem Status (auch
+// bezahlt), stornierte Rechnungen erscheinen nicht mehr in der Liste.
+async function cancelTestInvoices(page: any) {
+  const invoiceLinks = page.locator('table a', { hasText: /^E2E Test-Rechnung/ });
+  await page.goto(`/groups/${GROUP_ID}/invoices`);
+  while ((await invoiceLinks.count()) > 0) {
+    await invoiceLinks.first().click();
+    await page.waitForURL(/\/invoices\/\d+$/);
+    page.once('dialog', (dialog: any) => dialog.accept());
+    await page.getByRole('link', { name: 'Stornieren' }).click();
+    await expect(page.locator('#flash .alert-success')).toContainText(/storniert/);
+    await page.goto(`/groups/${GROUP_ID}/invoices`);
+  }
 }
 
 test.describe('Rechnungen', () => {
@@ -68,6 +85,7 @@ test.describe('Rechnungen', () => {
 
   test('Neue Rechnung erstellen und stornieren (als E2E Finanzen)', async ({ page }) => {
     await impersonateFinanzen(page);
+    await cancelTestInvoices(page);
 
     await createInvoice(page, 'rechnungen_erstellen');
 
@@ -77,6 +95,7 @@ test.describe('Rechnungen', () => {
 
   test('Rechnung als PDF drucken (als E2E Finanzen)', async ({ page }) => {
     await impersonateFinanzen(page);
+    await cancelTestInvoices(page);
 
     const invoiceUrl = await createInvoice(page, 'rechnungen_drucken');
 
@@ -101,6 +120,7 @@ test.describe('Rechnungen', () => {
 
   test('Zahlung erfassen setzt Rechnungsstatus auf bezahlt (als E2E Finanzen)', async ({ page }) => {
     await impersonateFinanzen(page);
+    await cancelTestInvoices(page);
 
     const invoiceUrl = await createInvoice(page, 'rechnungen_zahlung');
 
@@ -131,6 +151,7 @@ test.describe('Rechnungen', () => {
 
   test('Rechnung per E-Mail senden (als E2E Finanzen)', async ({ page }) => {
     await impersonateFinanzen(page);
+    await cancelTestInvoices(page);
 
     const invoiceUrl = await createInvoice(page, 'rechnungen_mail');
 
@@ -151,6 +172,7 @@ test.describe('Rechnungen', () => {
 
   test('Rechnung direkt auf einer Person erstellen (als E2E Finanzen)', async ({ page }) => {
     await impersonateFinanzen(page);
+    await cancelTestInvoices(page);
 
     // Auf der Personendetailseite gibt es (bei create_received_invoice- und
     // Personen-update-Recht) einen direkten "Rechnung erstellen"-Button, der

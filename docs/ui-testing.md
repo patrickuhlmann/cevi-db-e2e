@@ -261,7 +261,7 @@ await fields.locator('input[name$="[street]"]').fill('Bahnhofstrasse');
 
 Seit hitobito_oeku#12 ein Core-Attribut der Person. Das Feld `#person_canton` (Tom-Select) steckt in einem `field-visibility`-Container, der nur bei Land `CH` sichtbar ist; beim Wechsel auf ein anderes Land wird der Kanton per JS geleert. Sichtbarkeit über das Label prüfen: `label[for="person_canton-ts-control"]`. Kantonswerte sind Kleinbuchstaben-Kürzel (`ag`, `be`, …).
 
-Die E2E-Personen haben **kein Land** gesetzt (leer), dann ist das Kantonsfeld ausgeblendet, obwohl hitobito eine Person ohne Land als Schweizer behandelt (Bug, siehe CHANGELOG). Tests sollten am Schluss das Land wieder leeren.
+Die E2E-Personen haben **kein Land** gesetzt (leer), dann ist das Kantonsfeld ausgeblendet, obwohl hitobito eine Person ohne Land als Schweizer behandelt (Bug, hitobito/hitobito#4610). Tests sollten am Schluss das Land wieder leeren.
 
 Detailseite: Die Zeile "Kanton" (Cevi-Angaben) wird **immer** gerendert, ohne Wert mit leerem `<dd>`. Darum den Wert prüfen, nicht die Existenz der Zeile:
 ```typescript

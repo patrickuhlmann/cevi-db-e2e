@@ -37,7 +37,7 @@ Alle Tests basieren auf einer fixen Teststruktur auf dem Integrationssystem:
 
 **E2E Finanzen** (ID: 3556): Person mit Finanz-Berechtigung (Finanzverantwortliche/-r) sowie zusätzlich Adressverwalter/-in in E2E Jungschar (Gruppe 584). Wird für Rechnungs-Tests imitiert. Die zweite Rolle (layer_and_below_full) ist nötig, damit die Person-zu-Person-Rechnungserstellung (Empfänger-Vorausfüllung) funktioniert – die reine Finanzrolle gewährt kein Personen-Update-Recht, das dafür serverseitig verlangt wird.
 
-### Fixtures für `api-tests/` (und `kurs-duplizieren.spec.ts`)
+### Fixtures für `api-tests/` (und `kurs-duplizieren.spec.ts`, `eventvorlagen.spec.ts`)
 
 Permanente, manuell angelegte Events (im Gegensatz zu den UI-Tests, die ihre Events selbst erstellen/löschen – siehe `docs/api-testing.md`). "E2E API Kurs" dient zusätzlich als Quelle für `kurs-duplizieren.spec.ts` (nur gelesen; Name und Kursart GLK1 werden im Test erwartet):
 
@@ -62,6 +62,7 @@ Permanente, manuell angelegte Events (im Gegensatz zu den UI-Tests, die ihre Eve
 | `kurs.spec.ts` | Kurs erstellen und löschen (als E2E Mio Admin in E2E Mio) |
 | `kurs-anmeldung.spec.ts` | Person (E2E Leiter) für Kurs anmelden und abmelden (als E2E Mio Admin) |
 | `kurs-duplizieren.spec.ts` | Bestehenden Kurs (E2E API Kurs) duplizieren und Duplikat löschen (als E2E Mio Admin) |
+| `eventvorlagen.spec.ts` | Eventvorlagen: Anlass-Vorlage erstellen und Anlass daraus erstellen, E2E API Anlass als Vorlage speichern (als E2E AL); E2E API Kurs als Vorlage speichern und Kurs daraus erstellen; vererbte Vorlage aus E2E Mio in E2E Jungschar verfügbar (als E2E Mio Admin / E2E AL) |
 | `zusaetzliche-adressen.spec.ts` | Zusätzliche Adresse bei Person (E2E AL) und Gruppe (E2E Jungschar) erfassen, Anzeige prüfen und wieder entfernen (als Admin) |
 | `kanton.spec.ts` | Kanton bei E2E AL: Feld nur bei Land Schweiz, speichern/anzeigen, bei Ausland geleert; kein Kanton bei zusätzlichen Adressen (als Admin) |
 | `personennummer.spec.ts` | Personennummer von E2E AL auf der Detailseite und als erste Spalte im CSV-Export "Alle Angaben" (als Admin) |

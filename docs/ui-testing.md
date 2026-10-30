@@ -304,3 +304,16 @@ Ablauf: `/groups/:id/csv_imports/new` → Datei per `setInputFiles` (Buffer, Tre
 - Personennummer (`id`): nur mit Admin-Recht als Option vorhanden. Der Header "Personennummer" wird automatisch auf `id` gemappt.
 - **Neue Person mit vorgegebener ID testen, ohne die ID-Sequenz zu verschieben:** Nach einem Import mit IDs setzt hitobito die Sequenz auf `max(id)`, falls sie dahinter liegt. Eine willkürlich hohe ID würde darum alle künftigen IDs auf INTEGRATION verschieben. Stattdessen eine Person normal importieren (sie bekommt die nächste ID), löschen und diese freie ID für den Import verwenden.
 - Person löschen (nur mit Admin-Recht): Auf der Personenseite gibt es mehrere "Löschen"-Links (auch pro Rolle). Den Button `a.btn-danger[data-method="delete"]` verwenden, Bestätigung per nativem `confirm()`.
+
+## Eventvorlagen
+
+- Verwaltung unter `/groups/:id/event_templates` (Bearbeiten-Dropdown → "Eventvorlagen", nur auf Ebenen-Gruppen und nur mit `layer_full`/`layer_and_below_full` in **dieser** Ebene; für E2E Jungschar also E2E AL imitieren, für E2E Mio E2E Mio Admin). Neue Vorlage über "Anlass Vorlage erstellen" bzw. "Kurs Vorlage erstellen". Das Formular ist das normale Anlass-Formular (inkl. leerem Tab "Daten") plus Checkbox `#event_inherit` ("Vererbung"). Nach dem Speichern geht es zurück zur Vorlagenliste, auch bei "Als Vorlage speichern" mit `return_url`. Kontaktperson (`setEventContact`) und Disclosure der globalen Fragen sind wie beim Anlass Pflicht.
+- Vorlagenliste: Tabelle mit Name, Typ ("Anlass"/"Kurs"), Vererbung ("ja"/"nein"), Löschen-Icon `a[data-method="delete"]` mit nativem `confirm()`.
+- **"Anlass erstellen"/"Kurs erstellen" wird zum Split-Dropdown**, sobald für die Gruppe Vorlagen verfügbar sind (eigene oder vererbte). Dann gibt es zwei Elemente mit diesem Namen (Hauptlink + Toggle). Vorlage wählen:
+  ```typescript
+  const dropdown = page.locator('.btn-group.dropdown', { hasText: 'Anlass erstellen' });
+  await dropdown.locator('.dropdown-toggle').click();
+  await dropdown.locator('.dropdown-menu').getByRole('link', { name: 'E2E Anlass-Vorlage' }).click();
+  ```
+  Führt auf `…/events/new?source_id=<vorlage>`. Alle Angaben ausser den Daten sind übernommen, die Fragen inkl. Disclosure ebenfalls. Nur das Startdatum muss neu gesetzt werden. **Achtung:** Bleiben Vorlagen in E2E Jungschar/E2E Mio liegen, kann `getByRole('link', { name: /Anlass erstellen/ })` in `anlass.spec.ts` mehrdeutig werden. Darum räumen alle Vorlagen-Tests am Anfang und am Ende auf.
+- Nach dem Speichern über `waitForURL`/`toHaveURL` auf die Zielseite warten. `waitForLoadState()` direkt nach dem Klick liefert oft noch die alte URL.

@@ -19,6 +19,7 @@ const dialog = page.getByRole('dialog');
 await dialog.getByRole('textbox').fill(groupName);
 await dialog.getByRole('button', { name: 'Gruppen und Rollen definitiv löschen' }).click();
 ```
+Details zum Modal (Stimulus-Controller `confirm-deletion`): Der Vergleich ignoriert Gross/Kleinschreibung und Leerzeichen am Rand (`"  e2e lösch-test "` passt). Bei falschem Namen bleibt der Button `disabled`, Enter im Textfeld löst dann keinen Submit aus. "Abbrechen" ist ein Link (`getByRole('link', { name: 'Abbrechen' })`) und schliesst das Modal. Der Server prüft den Namen nicht, der Schutz ist rein clientseitig.
 
 ## Seitentitel
 

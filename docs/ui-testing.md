@@ -240,3 +240,19 @@ Das Eingangsdatum ist bereits mit dem heutigen Datum vorausgefüllt. Die Erfolgs
 ## Personenname: Reihenfolge unterscheidet sich je nach Kontext
 
 In Tabellen erscheint der Name als "Nachname Vorname" (siehe oben), im Rechnungs-Empfängerblock (Adressfeld) dagegen als "Vorname Nachname" (z.B. "E2E AL").
+
+## Zusätzliche Adressen (Personen und Gruppen)
+
+Seit hitobito/hitobito#4471 aktiv. Im Bearbeiten-Formular ist der Block ein Nested-Form `.nested-form[data-nested-form-assoc-value="additional_addresses"]`; bei **Gruppen** liegt er im Tab "Kontaktangaben" (`getByRole('tab', …)`, kein Link). Neuer Eintrag über den Link "Eintrag hinzufügen" im Nested-Form, die neuen Felder sind das letzte `.address-input-fields`. Felder per `name$="[…]"` ansprechen (die IDs enthalten bei neuen Einträgen einen Zufallsindex):
+```typescript
+const form = page.locator('.nested-form[data-nested-form-assoc-value="additional_addresses"]');
+await form.getByRole('link', { name: 'Eintrag hinzufügen' }).click();
+const fields = form.locator('.address-input-fields').last();
+await fields.locator('select[name$="[category_id]"]').selectOption({ label: 'Andere' });
+await fields.locator('input[name$="[street]"]').fill('Bahnhofstrasse');
+```
+- **Land ist Pflicht** ("Land muss ausgefüllt werden") und ein Tom-Select-Widget (wie bei Rechnungen): ID des versteckten `<select name$="[country]">` auslesen, dann `#<id>-ts-control` klicken und `#<id>-ts-dropdown [data-value="CH"]` wählen.
+- **"Namen der Person/Gruppe übernehmen"** (`[uses_contactable_name]`) ist standardmässig aktiv; die Namensfelder sind dann ausgeblendet und werden erst nach `uncheck()` sichtbar.
+- **"Bezeichnung" (`[label]`) wird beim Speichern verworfen** (Strong-Params-Fehler in hitobito, siehe CHANGELOG). Testeinträge darum nicht über die Bezeichnung, sondern z.B. über die Strasse identifizieren.
+- Entfernen: in der Zeile (`.labeled.controls`) den Link `.remove_nested_fields` klicken und speichern.
+- Anzeige: im ersten `<address>` als `"<Name>, <Strasse Nr>, <PLZ Ort>"`, gefolgt von der Kategorie (nur Kategorie, keine Bezeichnung) – direkt nach der Hauptadresse und vor den E-Mail-Adressen.

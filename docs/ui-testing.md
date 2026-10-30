@@ -409,3 +409,8 @@ Eine ungültige Haupt-E-Mail wird bei einer bestehenden Person **gespeichert**, 
 ## Gruppenadresse (Tab "Kontaktangaben")
 
 Im Gruppenformular liegen `#group_street`, `#group_zip_code`, `#group_town` und das Land `#group_country` (Tom-Select) im Tab `getByRole('tab', { name: 'Kontaktangaben' })`. E2E Jungschar hat keine eigene Adresse; Tests, die eine setzen, leeren sie danach wieder (Land über `el.tomselect.clear()`). Anzeige auf der Gruppenseite im Block "Kontaktangaben" als "<PLZ> <Ort>".
+
+## Anzeigeoptionen der Kontaktperson und iCal-Export
+
+- Im Anlass-Formular (Tab "Allgemein") stehen unter der Kontaktperson Checkboxen "Name anzeigen", "E-Mail anzeigen", "Telefonnummer anzeigen" usw. (`event[visible_contact_attributes][…]`), bei neuen Anlässen alle angewählt. Der Container wird erst sichtbar, wenn die Kontaktperson über das Autocomplete gewählt ist. Mit `setEventContact` bleibt er versteckt, darum die Checkboxen per `evaluate(el => el.checked = …)` setzen (über das `label` mit dem Text finden).
+- iCal eines Anlasses: `<anlass-url>.ics`, direkt mit `page.request.get()` laden (gleiche Session). Lange Zeilen sind umbrochen (`\r\n ` entfernen). Die Kontaktperson steht in `CONTACT:<Name>` und in der `DESCRIPTION`.

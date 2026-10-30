@@ -71,6 +71,7 @@ Permanente, manuell angelegte Events (im Gegensatz zu den UI-Tests, die ihre Eve
 | `kurs-duplizieren.spec.ts` | Bestehenden Kurs (E2E API Kurs) duplizieren und Duplikat löschen (als E2E Mio Admin) |
 | `eventvorlagen.spec.ts` | Eventvorlagen: Anlass-Vorlage erstellen und Anlass daraus erstellen, E2E API Anlass als Vorlage speichern (als E2E AL); E2E API Kurs als Vorlage speichern und Kurs daraus erstellen; vererbte Vorlage aus E2E Mio in E2E Jungschar verfügbar (als E2E Mio Admin / E2E AL) |
 | `kontaktperson.spec.ts` | Anlass ohne Kontaktperson und mit Kontaktperson ohne E-Mail (E2E Mami) wird abgelehnt, mit E2E AL gespeichert (als E2E AL) |
+| `kontaktperson-anzeige.spec.ts` | Anlass mit Kontaktperson E2E AL: iCal-Export enthält Name und E-Mail, ohne "E-Mail anzeigen" nur den Namen, ohne "Name anzeigen" nichts mehr zur Kontaktperson (als E2E AL) |
 | `hilfetexte.spec.ts` | Hilfetext für Person/Feld "Titel" mit "initial Anzeigen": im Personenformular (E2E Leiter) sofort sichtbar; ohne die Option versteckt und per Info-Icon einblendbar; Hilfetext wird gelöscht (als Admin) |
 | `ebics.spec.ts` | Rechnungseinstellungen, Tab "Zahlungsschnittstellen": pro Bank ein Abschnitt EBICS 3.0 und einer EBICS 2.5 (nur lesend, als E2E Finanzen) |
 | `rechnungen-herkunft.spec.ts` | Menüpunkt "Rechnungen" statt "Einzelrechnungen"; Einzelrechnung und Rechnungslauf (an E2E Mami) erscheinen gemeinsam in der Liste; Filter "Einzelrechnungen" / "aus Rechnungsläufen", gemerkt bei `returning=true`; Lauf löschen, Rechnung stornieren (als E2E Finanzen) |

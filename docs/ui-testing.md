@@ -405,3 +405,7 @@ Als Kontaktperson ohne E-Mail eignet sich E2E Mami (3553), sie ist für E2E AL s
 ## E-Mail-Validierung: Haupt-E-Mail bestehender Personen nicht mit ungültigen Werten testen
 
 Eine ungültige Haupt-E-Mail wird bei einer bestehenden Person **gespeichert**, solange die alte gültig war (siehe CHANGELOG, Bug in `Person#valid_email?`). Ein Test damit verändert die Login-Adresse der Testperson. Die Validierung darum über weitere E-Mails oder über eine neue Person (`/groups/:id/roles/new` → "Neue Person erfassen", `#role_new_person_email`) prüfen. Dort ist nach einem Fehler nichts angelegt. Das Feld `type="email"` lässt `a..b@x.ch` und `a.@x.ch` im Browser durch.
+
+## Gruppenadresse (Tab "Kontaktangaben")
+
+Im Gruppenformular liegen `#group_street`, `#group_zip_code`, `#group_town` und das Land `#group_country` (Tom-Select) im Tab `getByRole('tab', { name: 'Kontaktangaben' })`. E2E Jungschar hat keine eigene Adresse; Tests, die eine setzen, leeren sie danach wieder (Land über `el.tomselect.clear()`). Anzeige auf der Gruppenseite im Block "Kontaktangaben" als "<PLZ> <Ort>".

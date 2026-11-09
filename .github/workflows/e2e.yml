@@ -34,6 +34,14 @@ jobs:
     needs: setup
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    # Alle Laeufe teilen sich dieselbe hitobito-Instanz und dieselben
+    # Testpersonen/-daten. Parallele Laeufe (z.B. mehrere dependabot-PRs
+    # gleichzeitig) kommen sich in die Quere und brechen mit Timeouts ab.
+    # Daher global serialisieren; laufende Jobs nicht abbrechen (sonst
+    # bleiben Testdaten ohne Cleanup liegen).
+    concurrency:
+      group: hitobito-e2e
+      cancel-in-progress: false
     # Offizielles Playwright-Image: passende Browser sind vorinstalliert, kein
     # 'playwright install'-Download noetig (haengt sonst auf dem Runner).
     # Tag wird im 'setup'-Job aus package.json abgeleitet.
